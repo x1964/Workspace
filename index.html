@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DevHub Elite | منصة الفريق المتكاملة</title>
+  <title>DevHub Ultimate | المنصة المتكاملة</title>
 
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -12,48 +12,57 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;600;700&family=Fira+Code&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap');
 
     body {
       font-family: 'IBM Plex Sans Arabic', sans-serif;
       transition: 0.3s;
+      scroll-behavior: smooth;
     }
 
-    .glass {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(15px);
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
 
-    .comment-bubble {
-      position: relative;
-      background: #f3f4f6;
-      border-radius: 18px;
-      padding: 12px 16px;
+    .dark .glass-nav {
+      background: rgba(28, 28, 30, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    .dark .comment-bubble {
-      background: #3a3a3c;
+    .card-anim {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .nav-active {
-      color: #0A84FF;
-      border-bottom: 2px solid #0A84FF;
+    .card-anim:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
 
-    @keyframes slideIn {
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #0A84FF;
+      border-radius: 10px;
+    }
+
+    @keyframes fadeIn {
       from {
         opacity: 0;
-        transform: scale(0.95);
+        transform: translateY(10px);
       }
 
       to {
         opacity: 1;
-        transform: scale(1);
+        transform: translateY(0);
       }
     }
 
-    .page-anim {
-      animation: slideIn 0.3s ease-out;
+    .page-transition {
+      animation: fadeIn 0.4s ease-out forwards;
     }
   </style>
 
@@ -62,160 +71,75 @@
       darkMode: 'class',
       theme: {
         extend: {
-          colors: { darkBg: '#1C1C1E', brandBlue: '#0A84FF', surfaceDark: '#2C2C2E' }
+          colors: { brand: '#0A84FF', darkBg: '#121212', cardDark: '#1E1E1E' }
         }
       }
     }
   </script>
 </head>
 
-<body class="bg-[#F2F2F7] dark:bg-darkBg text-slate-900 dark:text-slate-100 min-h-screen">
+<body class="bg-gray-50 dark:bg-darkBg text-slate-900 dark:text-slate-100">
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, createContext, useContext } = React;
+    const { useState, useEffect, createContext, useContext, useMemo } = React;
 
     const AppContext = createContext();
 
     const AppProvider = ({ children }) => {
       const [isDark, setIsDark] = useState(true);
       const [view, setView] = useState('feed');
-      const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user_v4')));
-
-      // البيانات الأساسية
-      const [posts, setPosts] = useState(() => JSON.parse(localStorage.getItem('posts_v4')) || []);
-      const [tasks, setTasks] = useState(() => JSON.parse(localStorage.getItem('tasks_v4')) || []);
+      const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('dev_user_final')));
+      const [posts, setPosts] = useState(() => JSON.parse(localStorage.getItem('dev_posts_final')) || []);
+      const [tasks, setTasks] = useState(() => JSON.parse(localStorage.getItem('dev_tasks_final')) || []);
+      const [members] = useState([
+        { id: 1, name: 'أحمدLead', role: 'Full-Stack', status: 'online' },
+        { id: 2, name: 'سارة Design', role: 'UI/UX', status: 'away' },
+        { id: 3, name: 'عمر Dev', role: 'Backend', status: 'online' }
+      ]);
 
       useEffect(() => {
-        localStorage.setItem('user_v4', JSON.stringify(user));
-        localStorage.setItem('posts_v4', JSON.stringify(posts));
-        localStorage.setItem('tasks_v4', JSON.stringify(tasks));
+        localStorage.setItem('dev_user_final', JSON.stringify(user));
+        localStorage.setItem('dev_posts_final', JSON.stringify(posts));
+        localStorage.setItem('dev_tasks_final', JSON.stringify(tasks));
       }, [user, posts, tasks]);
 
       return (
-        <AppContext.Provider value={{ isDark, setIsDark, view, setView, user, setUser, posts, setPosts, tasks, setTasks }}>
+        <AppContext.Provider value={{ isDark, setIsDark, view, setView, user, setUser, posts, setPosts, tasks, setTasks, members }}>
           <div className={isDark ? 'dark' : ''}>{children}</div>
         </AppContext.Provider>
       );
     };
 
-    // --- المكونات العامة ---
-    const Header = () => {
-      const { isDark, setIsDark, setView, view, user, setUser } = useContext(AppContext);
-      const navLink = (target, label) => (
-        <button
-          onClick={() => setView(target)}
-          className={`pb-4 px-2 font-bold text-sm transition-all ${view === target ? 'text-brandBlue border-b-2 border-brandBlue' : 'text-gray-500 hover:text-brandBlue'}`}
-        >
-          {label}
+    // --- المكونات المساعدة ---
+    const SidebarItem = ({ id, icon, label }) => {
+      const { view, setView } = useContext(AppContext);
+      const active = view === id;
+      return (
+        <button onClick={() => setView(id)} className={`flex items-center gap-3 w-full p-4 rounded-2xl transition-all ${active ? 'bg-brand text-white shadow-lg shadow-brand/30' : 'hover:bg-gray-100 dark:hover:bg-gray-800 opacity-60 hover:opacity-100'}`}>
+          <span className="text-xl">{icon}</span>
+          <span className="font-bold text-sm">{label}</span>
         </button>
       );
-
-      return (
-        <nav className="sticky top-0 z-50 bg-white/80 dark:bg-darkBg/80 backdrop-blur-xl border-b dark:border-gray-800">
-          <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
-            <div className="flex items-center gap-8">
-              <h1 className="text-2xl font-black text-brandBlue tracking-tighter">DEV_ELITE</h1>
-              <div className="hidden md:flex gap-6 mt-4">
-                {navLink('feed', 'الرئيسية')}
-                {navLink('tasks', 'المهام')}
-                {navLink('admin', 'الأعضاء')}
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <button onClick={() => setIsDark(!isDark)} className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-lg">
-                {isDark ? '☀️' : '🌙'}
-              </button>
-              <div className="flex items-center gap-3 bg-gray-100 dark:bg-gray-800 p-1 pr-3 rounded-full border dark:border-gray-700 cursor-pointer" onClick={() => setView('profile')}>
-                <span className="text-xs font-bold hidden sm:block">{user.name}</span>
-                <div className="w-8 h-8 rounded-full bg-brandBlue text-white flex items-center justify-center font-bold">A</div>
-              </div>
-            </div>
-          </div>
-        </nav>
-      );
     };
 
-    // --- صفحة التغذية الإخبارية (Feed) ---
-    const FeedPage = () => {
-      const { posts, setPosts, user } = useContext(AppContext);
-      const [text, setText] = useState("");
-
-      const handlePost = () => {
-        if (!text.trim()) return;
-        const newPost = { id: Date.now(), author: user.name, content: text, likes: 0, comments: [], date: 'الآن' };
-        setPosts([newPost, ...posts]);
-        setText("");
-      };
-
+    // --- صفحة الإدارة / الأعضاء ---
+    const TeamPage = () => {
+      const { members } = useContext(AppContext);
       return (
-        <div className="max-w-2xl mx-auto py-8 page-anim">
-          <div className="bg-white dark:bg-surfaceDark p-6 rounded-[2rem] shadow-xl border dark:border-gray-800 mb-8">
-            <textarea
-              value={text} onChange={(e) => setText(e.target.value)}
-              placeholder="شارك فكرة أو كود مع الفريق..."
-              className="w-full h-24 bg-transparent outline-none text-lg resize-none"
-            ></textarea>
-            <div className="flex justify-end pt-4 border-t dark:border-gray-800">
-              <button onClick={handlePost} className="bg-brandBlue text-white px-6 py-2 rounded-xl font-bold hover:opacity-90">نشر</button>
-            </div>
-          </div>
-
-          {posts.map(post => (
-            <div key={post.id} className="bg-white dark:bg-surfaceDark rounded-[2rem] p-6 mb-6 shadow-sm border dark:border-gray-800">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-brandBlue/10 text-brandBlue flex items-center justify-center font-bold">{post.author[0]}</div>
-                <div><h4 className="font-bold text-sm">{post.author}</h4><p className="text-[10px] text-gray-500">{post.date}</p></div>
-              </div>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">{post.content}</p>
-
-              <div className="space-y-4 border-t dark:border-gray-800 pt-4">
-                {post.comments.map(c => (
-                  <div key={c.id} className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex-shrink-0"></div>
-                    <div className="comment-bubble flex-1">
-                      <div className="text-[10px] font-bold text-brandBlue mb-1">{c.user}</div>
-                      <div className="text-xs">{c.text}</div>
-                    </div>
-                  </div>
-                ))}
-                <div className="flex gap-2">
-                  <input
-                    placeholder="اكتب تعليقاً..."
-                    className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-xl px-4 py-2 text-xs outline-none"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && e.target.value) {
-                        const updated = posts.map(p => p.id === post.id ? { ...p, comments: [...p.comments, { id: Date.now(), user: user.name, text: e.target.value }] } : p);
-                        setPosts(updated);
-                        e.target.value = "";
-                      }
-                    }}
-                  />
+        <div className="page-transition space-y-6">
+          <h2 className="text-3xl font-black mb-8">فريق التطوير 👥</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {members.map(m => (
+              <div key={m.id} className="bg-white dark:bg-cardDark p-6 rounded-[2rem] border dark:border-gray-800 flex items-center gap-4 card-anim">
+                <div className="w-16 h-16 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-2xl font-bold">{m.name[0]}</div>
+                <div>
+                  <h4 className="font-bold">{m.name}</h4>
+                  <p className="text-xs text-gray-500 mb-2">{m.role}</p>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${m.status === 'online' ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'}`}>
+                    {m.status === 'online' ? 'متصل الآن' : 'بعيد'}
+                  </span>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    };
-
-    // --- صفحة المهام (Tasks) ---
-    const TasksPage = () => {
-      const { tasks, setTasks } = useContext(AppContext);
-      const [taskInput, setTaskInput] = useState("");
-
-      return (
-        <div className="max-w-4xl mx-auto py-8 page-anim">
-          <h2 className="text-3xl font-black mb-8 text-center">لوحة مهام الفريق 🛠️</h2>
-          <div className="flex gap-2 mb-8">
-            <input value={taskInput} onChange={e => setTaskInput(e.target.value)} className="flex-1 p-4 rounded-2xl bg-white dark:bg-surfaceDark outline-none shadow-sm" placeholder="أضف مهمة جديدة (مثلاً: تصميم اللوجو)" />
-            <button onClick={() => { if (taskInput) { setTasks([...tasks, { id: Date.now(), text: taskInput, done: false }]); setTaskInput(""); } }} className="bg-brandBlue text-white px-8 rounded-2xl font-bold">إضافة</button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {tasks.map(t => (
-              <div key={t.id} className={`p-5 rounded-2xl border flex items-center justify-between transition-all ${t.done ? 'bg-green-500/10 border-green-500/20 opacity-60' : 'bg-white dark:bg-surfaceDark dark:border-gray-800'}`}>
-                <span className={t.done ? 'line-through' : 'font-bold'}>{t.text}</span>
-                <input type="checkbox" checked={t.done} onChange={() => setTasks(tasks.map(x => x.id === t.id ? { ...x, done: !x.done } : x))} className="w-5 h-5 accent-brandBlue" />
               </div>
             ))}
           </div>
@@ -223,50 +147,118 @@
       );
     };
 
-    // --- صفحة الملف الشخصي (Profile) ---
-    const ProfilePage = () => {
-      const { user, setUser, setView } = useContext(AppContext);
-      return (
-        <div className="max-w-md mx-auto py-20 text-center page-anim">
-          <div className="w-32 h-32 bg-brandBlue mx-auto rounded-[2.5rem] flex items-center justify-center text-5xl text-white mb-6 shadow-2xl">A</div>
-          <h2 className="text-3xl font-black mb-2">{user.name}</h2>
-          <p className="text-gray-500 mb-8 font-mono tracking-widest uppercase text-xs">Verified Developer</p>
-          <button onClick={() => { setUser(null); setView('login'); }} className="w-full bg-red-500/10 text-red-500 p-4 rounded-2xl font-bold hover:bg-red-500 hover:text-white transition-all">تسجيل الخروج</button>
-        </div>
-      );
-    };
+    // --- صفحة المهام ---
+    const TasksPage = () => {
+      const { tasks, setTasks } = useContext(AppContext);
+      const [input, setInput] = useState("");
 
-    const Login = () => {
-      const { setUser } = useContext(AppContext);
-      const [n, setN] = useState("");
+      const addTask = () => {
+        if (!input.trim()) return;
+        setTasks([{ id: Date.now(), text: input, done: false }, ...tasks]);
+        setInput("");
+      };
+
       return (
-        <div className="min-h-screen flex items-center justify-center p-6 bg-slate-200 dark:bg-black">
-          <div className="bg-white dark:bg-darkBg p-12 rounded-[3rem] shadow-2xl w-full max-w-sm text-center">
-            <div className="text-6xl mb-6">⚡</div>
-            <h2 className="text-3xl font-black mb-8">DevHub Join</h2>
-            <input value={n} onChange={e => setN(e.target.value)} placeholder="اسمك المستعار" className="w-full p-4 rounded-2xl bg-gray-100 dark:bg-gray-800 mb-4 text-center font-bold outline-none border-2 border-transparent focus:border-brandBlue transition-all" />
-            <button onClick={() => n && setUser({ name: n })} className="w-full bg-brandBlue text-white p-4 rounded-2xl font-black shadow-lg">دخول</button>
+        <div className="page-transition max-w-3xl mx-auto">
+          <h2 className="text-3xl font-black mb-8 text-center">خارطة الطريق 🗺️</h2>
+          <div className="bg-white dark:bg-cardDark p-4 rounded-[2rem] flex gap-3 shadow-xl mb-10 border dark:border-gray-800">
+            <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addTask()} className="flex-1 bg-transparent px-4 outline-none font-bold" placeholder="ما هي المهمة القادمة؟" />
+            <button onClick={addTask} className="bg-brand text-white px-8 py-3 rounded-2xl font-bold hover:scale-105 transition-all">إضافة</button>
+          </div>
+          <div className="space-y-4">
+            {tasks.map(t => (
+              <div key={t.id} className={`p-6 rounded-[1.5rem] border flex items-center justify-between transition-all ${t.done ? 'bg-gray-100 dark:bg-gray-800/30 opacity-50 border-transparent' : 'bg-white dark:bg-cardDark border-gray-100 dark:border-gray-800 shadow-sm'}`}>
+                <div className="flex items-center gap-4">
+                  <input type="checkbox" checked={t.done} onChange={() => setTasks(tasks.map(x => x.id === t.id ? { ...x, done: !x.done } : x))} className="w-6 h-6 rounded-lg accent-brand" />
+                  <span className={`font-bold ${t.done ? 'line-through' : ''}`}>{t.text}</span>
+                </div>
+                <button onClick={() => setTasks(tasks.filter(x => x.id !== t.id))} className="text-red-500 opacity-0 hover:opacity-100 transition-opacity font-bold text-xs">حذف</button>
+              </div>
+            ))}
           </div>
         </div>
       );
     };
 
+    // --- المكون الرئيسي ---
     const App = () => {
-      const { user, view } = useContext(AppContext);
-      if (!user) return <Login />;
+      const { user, setUser, view, setView, isDark, setIsDark, posts, setPosts } = useContext(AppContext);
+      const [postInput, setPostInput] = useState("");
+
+      if (!user) return (
+        <div className="min-h-screen flex items-center justify-center p-6 bg-slate-100 dark:bg-black">
+          <div className="bg-white dark:bg-cardDark p-12 rounded-[3rem] shadow-2xl w-full max-w-sm text-center page-transition">
+            <div className="text-6xl mb-6 animate-bounce">🚀</div>
+            <h2 className="text-3xl font-black mb-2 tracking-tighter text-brand">DevHub Elite</h2>
+            <p className="text-gray-500 mb-10 text-sm font-medium">مساحة عمل مخصصة للمحترفين</p>
+            <input id="userName" placeholder="اكتب اسمك للدخول" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 mb-6 text-center font-bold outline-none border-2 border-transparent focus:border-brand transition-all" />
+            <button onClick={() => { const n = document.getElementById('userName').value; if (n) setUser({ name: n }) }} className="w-full bg-brand text-white p-5 rounded-2xl font-black shadow-xl shadow-brand/30 hover:scale-[1.02] active:scale-95 transition-all">ابدأ الآن</button>
+          </div>
+        </div>
+      );
+
       return (
-        <div>
-          <Header />
-          <main className="px-6">
-            {view === 'feed' && <FeedPage />}
-            {view === 'tasks' && <TasksPage />}
-            {view === 'profile' && <ProfilePage />}
-            {view === 'admin' && (
-              <div className="max-w-2xl mx-auto py-20 text-center page-anim opacity-50">
-                <h2 className="text-4xl font-black mb-4">قريباً.. 🏗️</h2>
-                <p>هنا ستتمكن من رؤية إحصائيات الفريق بالكامل.</p>
+        <div className="min-h-screen flex flex-col md:flex-row">
+          {/* القائمة الجانبية - Sidebar */}
+          <aside className="w-full md:w-72 bg-white dark:bg-cardDark border-l dark:border-gray-800 p-6 flex flex-col gap-8 z-40">
+            <div className="text-2xl font-black text-brand tracking-tighter">DEV_ELITE</div>
+            <div className="flex flex-col gap-2">
+              <SidebarItem id="feed" icon="🏠" label="الرئيسية" />
+              <SidebarItem id="tasks" icon="📋" label="المهام" />
+              <SidebarItem id="team" icon="👥" label="الفريق" />
+            </div>
+            <div className="mt-auto pt-6 border-t dark:border-gray-800">
+              <button onClick={() => setIsDark(!isDark)} className="w-full p-4 rounded-2xl bg-gray-50 dark:bg-gray-800 font-bold mb-4">
+                {isDark ? '☀️ الوضع الفاتح' : '🌙 الوضع الليلي'}
+              </button>
+              <button onClick={() => setUser(null)} className="w-full p-4 text-red-500 font-bold hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all text-sm">تسجيل الخروج</button>
+            </div>
+          </aside>
+
+          {/* المحتوى الرئيسي */}
+          <main className="flex-1 p-6 md:p-12 custom-scrollbar overflow-y-auto">
+            {view === 'feed' && (
+              <div className="page-transition max-w-2xl mx-auto">
+                <div className="bg-white dark:bg-cardDark p-6 rounded-[2.5rem] shadow-xl mb-10 border dark:border-gray-800">
+                  <textarea value={postInput} onChange={e => setPostInput(e.target.value)} className="w-full h-32 bg-transparent outline-none text-lg font-medium resize-none" placeholder={`ما الجديد في مشروعنا يا ${user.name}؟`}></textarea>
+                  <div className="flex justify-end pt-4 border-t dark:border-gray-800">
+                    <button onClick={() => { if (postInput) { setPosts([{ id: Date.now(), author: user.name, content: postInput, comments: [] }, ...posts]); setPostInput(""); } }} className="bg-brand text-white px-10 py-3 rounded-2xl font-black shadow-lg shadow-brand/20 hover:opacity-90 active:scale-95 transition-all">نشر الفكرة</button>
+                  </div>
+                </div>
+                {posts.map(post => (
+                  <div key={post.id} className="bg-white dark:bg-cardDark p-8 rounded-[2.5rem] mb-8 border dark:border-gray-800 card-anim">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-12 h-12 rounded-2xl bg-brand/10 text-brand flex items-center justify-center font-black text-xl">{post.author[0]}</div>
+                      <div><h4 className="font-bold">{post.author}</h4><p className="text-[10px] text-gray-400 font-mono">ID: {post.id.toString().slice(-5)}</p></div>
+                    </div>
+                    <p className="text-gray-800 dark:text-gray-200 text-lg leading-relaxed mb-8">{post.content}</p>
+                    <div className="pt-6 border-t dark:border-gray-800">
+                      <div className="space-y-4">
+                        {post.comments.map(c => (
+                          <div key={c.id} className="flex gap-3 items-start animate-fadeIn">
+                            <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex-shrink-0"></div>
+                            <div className="bg-gray-50 dark:bg-gray-800/50 px-5 py-3 rounded-[1.5rem] flex-1">
+                              <div className="text-[10px] font-bold text-brand mb-1 uppercase tracking-widest">{c.user}</div>
+                              <div className="text-sm font-medium">{c.text}</div>
+                            </div>
+                          </div>
+                        ))}
+                        <input placeholder="أضف تعليقاً واضغط Enter..." className="w-full bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl text-xs font-bold outline-none focus:ring-1 focus:ring-brand"
+                          onKeyDown={e => {
+                            if (e.key === 'Enter' && e.target.value) {
+                              setPosts(posts.map(p => p.id === post.id ? { ...p, comments: [...p.comments, { id: Date.now(), user: user.name, text: e.target.value }] } : p));
+                              e.target.value = "";
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
+            {view === 'tasks' && <TasksPage />}
+            {view === 'team' && <TeamPage />}
           </main>
         </div>
       );
