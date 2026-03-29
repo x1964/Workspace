@@ -3,66 +3,318 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DevHub Ultimate | المنصة المتكاملة</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="DevHub Elite - منصة تطوير متكاملة للفرق الاحترافية">
+  <meta name="theme-color" content="#0A84FF">
+  <title>DevHub Elite | منصة التطوير المتكاملة</title>
 
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+
+  <!-- Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- React & Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap');
+    :root {
+      --brand: #0A84FF;
+      --brand-light: #5AC8FA;
+      --brand-dark: #0077E6;
+      --success: #34C759;
+      --warning: #FF9500;
+      --danger: #FF3B30;
+      --dark-bg: #0A0A0F;
+      --card-dark: #141419;
+      --glass-dark: rgba(20, 20, 25, 0.85);
+      --glass-light: rgba(255, 255, 255, 0.85);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
 
     body {
-      font-family: 'IBM Plex Sans Arabic', sans-serif;
-      transition: 0.3s;
-      scroll-behavior: smooth;
+      font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--dark-bg);
+      color: #F5F5F7;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    .glass-nav {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
     }
 
-    .dark .glass-nav {
-      background: rgba(28, 28, 30, 0.8);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    ::-webkit-scrollbar-track {
+      background: transparent;
     }
 
-    .card-anim {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    ::-webkit-scrollbar-thumb {
+      background: rgba(10, 132, 255, 0.3);
+      border-radius: 100px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
     }
 
-    .card-anim:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(10, 132, 255, 0.5);
     }
 
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 5px;
+    /* Glassmorphism Effects */
+    .glass {
+      background: var(--glass-dark);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #0A84FF;
-      border-radius: 10px;
+    .glass-light {
+      background: var(--glass-light);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(0, 0, 0, 0.05);
     }
 
-    @keyframes fadeIn {
+    /* Modern Card Design */
+    .modern-card {
+      background: var(--card-dark);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 24px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .modern-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    }
+
+    .modern-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      border-color: rgba(10, 132, 255, 0.3);
+      box-shadow: 0 20px 40px -10px rgba(10, 132, 255, 0.15);
+    }
+
+    /* Gradient Text */
+    .gradient-text {
+      background: linear-gradient(135deg, #0A84FF 0%, #5AC8FA 50%, #0A84FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Animated Background */
+    .bg-gradient-mesh {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(10, 132, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(90, 200, 250, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(10, 132, 255, 0.05) 0%, transparent 70%);
+      animation: meshMove 20s ease-in-out infinite;
+    }
+
+    @keyframes meshMove {
+
+      0%,
+      100% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      33% {
+        transform: translate(30px, -30px) scale(1.1);
+      }
+
+      66% {
+        transform: translate(-20px, 20px) scale(0.95);
+      }
+    }
+
+    /* Page Transitions */
+    .page-enter {
+      animation: pageEnter 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes pageEnter {
       from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(20px) scale(0.98);
       }
 
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
       }
     }
 
-    .page-transition {
-      animation: fadeIn 0.4s ease-out forwards;
+    /* Button Effects */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-primary:hover::after {
+      left: 100%;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    /* Input Styling */
+    .modern-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .modern-input:focus {
+      border-color: var(--brand);
+      background: rgba(10, 132, 255, 0.05);
+      box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.1);
+    }
+
+    /* Status Indicators */
+    .status-online {
+      background: var(--success);
+      box-shadow: 0 0 0 2px var(--card-dark), 0 0 0 4px rgba(52, 199, 89, 0.3);
+    }
+
+    .status-away {
+      background: var(--warning);
+      box-shadow: 0 0 0 2px var(--card-dark), 0 0 0 4px rgba(255, 149, 0, 0.3);
+    }
+
+    /* Loading Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0;
+      }
+
+      100% {
+        background-position: -200% 0;
+      }
+    }
+
+    /* Toast Notifications */
+    .toast {
+      animation: toastSlide 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes toastSlide {
+      from {
+        opacity: 0;
+        transform: translateX(100%) scale(0.8);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    /* Container Queries for Component Responsiveness */
+    @supports (container-type: inline-size) {
+      .task-container {
+        container-type: inline-size;
+      }
+
+      @container (max-width: 400px) {
+        .task-item {
+          flex-direction: column;
+          gap: 12px;
+        }
+      }
+    }
+
+    /* Mobile Optimizations */
+    @media (max-width: 768px) {
+
+      .glass,
+      .glass-light {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .modern-card {
+        border-radius: 20px;
+      }
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Focus Visible for Accessibility */
+    :focus-visible {
+      outline: 2px solid var(--brand);
+      outline-offset: 2px;
+    }
+
+    /* Selection Color */
+    ::selection {
+      background: rgba(10, 132, 255, 0.3);
+      color: white;
     }
   </style>
 
@@ -71,108 +323,761 @@
       darkMode: 'class',
       theme: {
         extend: {
-          colors: { brand: '#0A84FF', darkBg: '#121212', cardDark: '#1E1E1E' }
+          colors: {
+            brand: '#0A84FF',
+            'brand-light': '#5AC8FA',
+            darkBg: '#0A0A0F',
+            cardDark: '#141419',
+          },
+          fontFamily: {
+            sans: ['IBM Plex Sans Arabic', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
         }
       }
     }
   </script>
 </head>
 
-<body class="bg-gray-50 dark:bg-darkBg text-slate-900 dark:text-slate-100">
+<body class="antialiased">
+  <div class="bg-gradient-mesh"></div>
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, createContext, useContext, useMemo } = React;
+    const { useState, useEffect, useCallback, useMemo, createContext, useContext, useRef } = React;
+
+    // ==========================================
+    // SECURITY & ENCRYPTION UTILITIES
+    // ==========================================
+
+    const SecurityUtils = {
+      // Simple encryption for localStorage (not for sensitive data!)
+      encrypt: (data, key = 'devhub_default_key') => {
+        try {
+          const str = JSON.stringify(data);
+          let encrypted = '';
+          for (let i = 0; i < str.length; i++) {
+            encrypted += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+          }
+          return btoa(encrypted);
+        } catch (e) {
+          console.error('Encryption error:', e);
+          return null;
+        }
+      },
+
+      decrypt: (encrypted, key = 'devhub_default_key') => {
+        try {
+          const str = atob(encrypted);
+          let decrypted = '';
+          for (let i = 0; i < str.length; i++) {
+            decrypted += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+          }
+          return JSON.parse(decrypted);
+        } catch (e) {
+          console.error('Decryption error:', e);
+          return null;
+        }
+      },
+
+      // Sanitize user input to prevent XSS
+      sanitizeInput: (input) => {
+        if (typeof input !== 'string') return input;
+        return input
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#x27;')
+          .replace(/\//g, '&#x2F;');
+      },
+
+      // Generate secure ID
+      generateId: () => {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+      },
+
+      // Validate data structure
+      validateUser: (user) => {
+        if (!user || typeof user !== 'object') return false;
+        if (!user.name || typeof user.name !== 'string') return false;
+        if (user.name.length > 50) return false;
+        return true;
+      },
+
+      validatePost: (post) => {
+        if (!post || typeof post !== 'object') return false;
+        if (!post.content || typeof post.content !== 'string') return false;
+        if (post.content.length > 2000) return false;
+        if (!post.author || typeof post.author !== 'string') return false;
+        return true;
+      }
+    };
+
+    // ==========================================
+    // SECURE STORAGE HOOK
+    // ==========================================
+
+    const useSecureStorage = (key, initialValue, options = {}) => {
+      const { encrypt = false, ttl = null } = options;
+      const [value, setValue] = useState(() => {
+        try {
+          const item = localStorage.getItem(key);
+          if (!item) return initialValue;
+
+          let parsed;
+          if (encrypt) {
+            parsed = SecurityUtils.decrypt(item);
+          } else {
+            parsed = JSON.parse(item);
+          }
+
+          // Check TTL
+          if (ttl && parsed && parsed._timestamp) {
+            if (Date.now() - parsed._timestamp > ttl) {
+              localStorage.removeItem(key);
+              return initialValue;
+            }
+            return parsed.data;
+          }
+
+          return parsed;
+        } catch (error) {
+          console.warn(`Error reading ${key}:`, error);
+          return initialValue;
+        }
+      });
+
+      const setStoredValue = useCallback((newValue) => {
+        try {
+          const valueToStore = newValue instanceof Function ? newValue(value) : newValue;
+          setValue(valueToStore);
+
+          let storageValue;
+          if (ttl) {
+            storageValue = { data: valueToStore, _timestamp: Date.now() };
+          } else {
+            storageValue = valueToStore;
+          }
+
+          if (encrypt) {
+            localStorage.setItem(key, SecurityUtils.encrypt(storageValue));
+          } else {
+            localStorage.setItem(key, JSON.stringify(storageValue));
+          }
+        } catch (error) {
+          console.warn(`Error saving ${key}:`, error);
+        }
+      }, [key, encrypt, ttl, value]);
+
+      const removeValue = useCallback(() => {
+        try {
+          localStorage.removeItem(key);
+          setValue(initialValue);
+        } catch (error) {
+          console.warn(`Error removing ${key}:`, error);
+        }
+      }, [key, initialValue]);
+
+      return [value, setStoredValue, removeValue];
+    };
+
+    // ==========================================
+    // APP CONTEXT
+    // ==========================================
 
     const AppContext = createContext();
 
     const AppProvider = ({ children }) => {
-      const [isDark, setIsDark] = useState(true);
+      // Use secure storage with encryption for user data
+      const [user, setUser, removeUser] = useSecureStorage('devhub_user_v2', null, { encrypt: true });
+      const [posts, setPosts, removePosts] = useSecureStorage('devhub_posts_v2', []);
+      const [tasks, setTasks, removeTasks] = useSecureStorage('devhub_tasks_v2', []);
       const [view, setView] = useState('feed');
-      const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('dev_user_final')));
-      const [posts, setPosts] = useState(() => JSON.parse(localStorage.getItem('dev_posts_final')) || []);
-      const [tasks, setTasks] = useState(() => JSON.parse(localStorage.getItem('dev_tasks_final')) || []);
-      const [members] = useState([
-        { id: 1, name: 'أحمدLead', role: 'Full-Stack', status: 'online' },
-        { id: 2, name: 'سارة Design', role: 'UI/UX', status: 'away' },
-        { id: 3, name: 'عمر Dev', role: 'Backend', status: 'online' }
-      ]);
+      const [isLoading, setIsLoading] = useState(false);
+      const [toast, setToast] = useState(null);
 
-      useEffect(() => {
-        localStorage.setItem('dev_user_final', JSON.stringify(user));
-        localStorage.setItem('dev_posts_final', JSON.stringify(posts));
-        localStorage.setItem('dev_tasks_final', JSON.stringify(tasks));
-      }, [user, posts, tasks]);
+      // Show toast notification
+      const showToast = useCallback((message, type = 'info') => {
+        setToast({ message, type, id: SecurityUtils.generateId() });
+        setTimeout(() => setToast(null), 3000);
+      }, []);
+
+      // Secure setters with validation
+      const secureSetUser = useCallback((userData) => {
+        if (userData && !SecurityUtils.validateUser(userData)) {
+          showToast('بيانات المستخدم غير صالحة', 'error');
+          return;
+        }
+        setUser(userData);
+      }, [setUser, showToast]);
+
+      const secureSetPosts = useCallback((newPosts) => {
+        const validPosts = Array.isArray(newPosts) ? newPosts.filter(SecurityUtils.validatePost) : [];
+        setPosts(validPosts);
+      }, [setPosts]);
+
+      const addPost = useCallback((content) => {
+        const sanitizedContent = SecurityUtils.sanitizeInput(content);
+        if (!sanitizedContent.trim()) {
+          showToast('لا يمكن نشر محتوى فارغ', 'warning');
+          return;
+        }
+
+        const newPost = {
+          id: SecurityUtils.generateId(),
+          author: user?.name || 'مجهول',
+          content: sanitizedContent,
+          comments: [],
+          timestamp: Date.now(),
+          likes: 0
+        };
+
+        setPosts(prev => [newPost, ...prev]);
+        showToast('تم نشر الفكرة بنجاح!', 'success');
+      }, [user, setPosts, showToast]);
+
+      const addComment = useCallback((postId, text) => {
+        const sanitizedText = SecurityUtils.sanitizeInput(text);
+        if (!sanitizedText.trim()) return;
+
+        setPosts(prev => prev.map(post => {
+          if (post.id === postId) {
+            return {
+              ...post,
+              comments: [...post.comments, {
+                id: SecurityUtils.generateId(),
+                user: user?.name || 'مجهول',
+                text: sanitizedText,
+                timestamp: Date.now()
+              }]
+            };
+          }
+          return post;
+        }));
+      }, [user, setPosts]);
+
+      const addTask = useCallback((text) => {
+        const sanitizedText = SecurityUtils.sanitizeInput(text);
+        if (!sanitizedText.trim()) return;
+
+        const newTask = {
+          id: SecurityUtils.generateId(),
+          text: sanitizedText,
+          done: false,
+          createdAt: Date.now()
+        };
+
+        setTasks(prev => [newTask, ...prev]);
+        showToast('تمت إضافة المهمة', 'success');
+      }, [setTasks, showToast]);
+
+      const toggleTask = useCallback((taskId) => {
+        setTasks(prev => prev.map(t =>
+          t.id === taskId ? { ...t, done: !t.done } : t
+        ));
+      }, [setTasks]);
+
+      const deleteTask = useCallback((taskId) => {
+        setTasks(prev => prev.filter(t => t.id !== taskId));
+        showToast('تم حذف المهمة', 'info');
+      }, [setTasks, showToast]);
+
+      const logout = useCallback(() => {
+        removeUser();
+        removePosts();
+        removeTasks();
+        showToast('تم تسجيل الخروج بنجاح', 'info');
+      }, [removeUser, removePosts, removeTasks, showToast]);
+
+      const members = useMemo(() => [
+        { id: 1, name: 'أحمد', role: 'Full-Stack Lead', status: 'online', avatar: 'أ' },
+        { id: 2, name: 'سارة', role: 'UI/UX Designer', status: 'online', avatar: 'س' },
+        { id: 3, name: 'عمر', role: 'Backend Dev', status: 'away', avatar: 'ع' },
+        { id: 4, name: 'نور', role: 'DevOps Engineer', status: 'offline', avatar: 'ن' }
+      ], []);
+
+      const value = {
+        user,
+        setUser: secureSetUser,
+        posts,
+        setPosts: secureSetPosts,
+        addPost,
+        addComment,
+        tasks,
+        addTask,
+        toggleTask,
+        deleteTask,
+        members,
+        view,
+        setView,
+        isLoading,
+        setIsLoading,
+        toast,
+        showToast,
+        logout
+      };
 
       return (
-        <AppContext.Provider value={{ isDark, setIsDark, view, setView, user, setUser, posts, setPosts, tasks, setTasks, members }}>
-          <div className={isDark ? 'dark' : ''}>{children}</div>
+        <AppContext.Provider value={value}>
+          {children}
+          {toast && <Toast notification={toast} />}
         </AppContext.Provider>
       );
     };
 
-    // --- المكونات المساعدة ---
-    const SidebarItem = ({ id, icon, label }) => {
+    // ==========================================
+    // UI COMPONENTS
+    // ==========================================
+
+    const Toast = ({ notification }) => {
+      const colors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        warning: 'bg-orange-500',
+        info: 'bg-blue-500'
+      };
+
+      const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '!',
+        info: 'ℹ'
+      };
+
+      return (
+        <div className="fixed top-6 left-6 z-50 toast">
+          <div className={`${colors[notification.type]} text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 font-bold min-w-[300px]`}>
+            <span className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-lg">
+              {icons[notification.type]}
+            </span>
+            <span>{notification.message}</span>
+          </div>
+        </div>
+      );
+    };
+
+    const SidebarItem = ({ id, icon, label, count }) => {
       const { view, setView } = useContext(AppContext);
       const active = view === id;
+
       return (
-        <button onClick={() => setView(id)} className={`flex items-center gap-3 w-full p-4 rounded-2xl transition-all ${active ? 'bg-brand text-white shadow-lg shadow-brand/30' : 'hover:bg-gray-100 dark:hover:bg-gray-800 opacity-60 hover:opacity-100'}`}>
-          <span className="text-xl">{icon}</span>
+        <button
+          onClick={() => setView(id)}
+          className={`flex items-center gap-3 w-full p-4 rounded-2xl transition-all duration-300 group ${active
+              ? 'bg-brand text-white shadow-lg shadow-brand/30'
+              : 'hover:bg-white/5 text-gray-400 hover:text-white'
+            }`}
+        >
+          <span className="text-xl transition-transform group-hover:scale-110">{icon}</span>
           <span className="font-bold text-sm">{label}</span>
+          {count > 0 && (
+            <span className={`mr-auto text-xs font-bold px-2 py-1 rounded-full ${active ? 'bg-white/20' : 'bg-brand/20 text-brand'
+              }`}>
+              {count}
+            </span>
+          )}
         </button>
       );
     };
 
-    // --- صفحة الإدارة / الأعضاء ---
-    const TeamPage = () => {
-      const { members } = useContext(AppContext);
+    const Avatar = ({ name, size = 'md', status }) => {
+      const sizes = {
+        sm: 'w-10 h-10 text-sm',
+        md: 'w-12 h-12 text-lg',
+        lg: 'w-16 h-16 text-2xl',
+        xl: 'w-20 h-20 text-3xl'
+      };
+
+      const initial = name ? name[0].toUpperCase() : '?';
+
       return (
-        <div className="page-transition space-y-6">
-          <h2 className="text-3xl font-black mb-8">فريق التطوير 👥</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {members.map(m => (
-              <div key={m.id} className="bg-white dark:bg-cardDark p-6 rounded-[2rem] border dark:border-gray-800 flex items-center gap-4 card-anim">
-                <div className="w-16 h-16 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-2xl font-bold">{m.name[0]}</div>
-                <div>
-                  <h4 className="font-bold">{m.name}</h4>
-                  <p className="text-xs text-gray-500 mb-2">{m.role}</p>
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${m.status === 'online' ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'}`}>
-                    {m.status === 'online' ? 'متصل الآن' : 'بعيد'}
-                  </span>
-                </div>
-              </div>
-            ))}
+        <div className="relative">
+          <div className={`${sizes[size]} rounded-2xl bg-gradient-to-br from-brand/20 to-brand/5 text-brand flex items-center justify-center font-bold border border-brand/20`}>
+            {initial}
           </div>
+          {status && (
+            <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[var(--card-dark)] ${status === 'online' ? 'status-online' :
+                status === 'away' ? 'status-away' : 'bg-gray-500'
+              }`} />
+          )}
         </div>
       );
     };
 
-    // --- صفحة المهام ---
-    const TasksPage = () => {
-      const { tasks, setTasks } = useContext(AppContext);
-      const [input, setInput] = useState("");
+    // ==========================================
+    // PAGES
+    // ==========================================
 
-      const addTask = () => {
-        if (!input.trim()) return;
-        setTasks([{ id: Date.now(), text: input, done: false }, ...tasks]);
-        setInput("");
+    const LoginPage = () => {
+      const { setUser, showToast } = useContext(AppContext);
+      const [name, setName] = useState('');
+      const [isSubmitting, setIsSubmitting] = useState(false);
+
+      const handleLogin = async (e) => {
+        e.preventDefault();
+        if (!name.trim()) {
+          showToast('الرجاء إدخال اسمك', 'warning');
+          return;
+        }
+
+        setIsSubmitting(true);
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        setUser({ name: name.trim(), id: SecurityUtils.generateId(), joinedAt: Date.now() });
+        showToast(`أهلاً بك يا ${name.trim()}!`, 'success');
+        setIsSubmitting(false);
       };
 
       return (
-        <div className="page-transition max-w-3xl mx-auto">
-          <h2 className="text-3xl font-black mb-8 text-center">خارطة الطريق 🗺️</h2>
-          <div className="bg-white dark:bg-cardDark p-4 rounded-[2rem] flex gap-3 shadow-xl mb-10 border dark:border-gray-800">
-            <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addTask()} className="flex-1 bg-transparent px-4 outline-none font-bold" placeholder="ما هي المهمة القادمة؟" />
-            <button onClick={addTask} className="bg-brand text-white px-8 py-3 rounded-2xl font-bold hover:scale-105 transition-all">إضافة</button>
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <div className="modern-card p-8 md:p-12 w-full max-w-md page-enter">
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-brand to-brand-light flex items-center justify-center text-4xl shadow-2xl shadow-brand/30">
+                🚀
+              </div>
+              <h1 className="text-3xl md:text-4xl font-black mb-2 gradient-text">DevHub Elite</h1>
+              <p className="text-gray-400 text-sm">منصة التطوير المتكاملة للفرق الاحترافية</p>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div>
+                <label className="block text-sm font-bold text-gray-400 mb-2">اسم المستخدم</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  maxLength={50}
+                  className="modern-input w-full p-5 rounded-2xl text-center font-bold text-lg outline-none"
+                  placeholder="اكتب اسمك للدخول"
+                  autoFocus
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="btn-primary w-full text-white p-5 rounded-2xl font-black text-lg shadow-xl shadow-brand/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    جاري الدخول...
+                  </span>
+                ) : (
+                  'ابدأ الآن'
+                )}
+              </button>
+            </form>
+
+            <div className="mt-8 pt-6 border-t border-white/5 text-center">
+              <p className="text-xs text-gray-500">
+                🔒 البيانات مشفرة ومحمية محلياً في متصفحك
+              </p>
+            </div>
           </div>
-          <div className="space-y-4">
-            {tasks.map(t => (
-              <div key={t.id} className={`p-6 rounded-[1.5rem] border flex items-center justify-between transition-all ${t.done ? 'bg-gray-100 dark:bg-gray-800/30 opacity-50 border-transparent' : 'bg-white dark:bg-cardDark border-gray-100 dark:border-gray-800 shadow-sm'}`}>
-                <div className="flex items-center gap-4">
-                  <input type="checkbox" checked={t.done} onChange={() => setTasks(tasks.map(x => x.id === t.id ? { ...x, done: !x.done } : x))} className="w-6 h-6 rounded-lg accent-brand" />
-                  <span className={`font-bold ${t.done ? 'line-through' : ''}`}>{t.text}</span>
+        </div>
+      );
+    };
+
+    const FeedPage = () => {
+      const { user, posts, addPost, addComment, showToast } = useContext(AppContext);
+      const [newPost, setNewPost] = useState('');
+      const [isExpanded, setIsExpanded] = useState(false);
+
+      const handleSubmit = () => {
+        if (!newPost.trim()) {
+          showToast('اكتب شيئاً أولاً!', 'warning');
+          return;
+        }
+        addPost(newPost);
+        setNewPost('');
+        setIsExpanded(false);
+      };
+
+      const formatTime = (timestamp) => {
+        const diff = Date.now() - timestamp;
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+
+        if (minutes < 1) return 'الآن';
+        if (minutes < 60) return `منذ ${minutes} دقيقة`;
+        if (hours < 24) return `منذ ${hours} ساعة`;
+        return `منذ ${days} يوم`;
+      };
+
+      return (
+        <div className="page-enter max-w-3xl mx-auto space-y-6">
+          {/* Create Post */}
+          <div className="modern-card p-6">
+            <div className="flex gap-4">
+              <Avatar name={user?.name} size="md" />
+              <div className="flex-1">
+                <textarea
+                  value={newPost}
+                  onChange={(e) => setNewPost(e.target.value)}
+                  onFocus={() => setIsExpanded(true)}
+                  placeholder={`ما الجديد يا ${user?.name}؟`}
+                  maxLength={2000}
+                  className="modern-input w-full p-4 rounded-2xl outline-none resize-none min-h-[100px]"
+                />
+                <div className={`flex justify-between items-center mt-4 pt-4 border-t border-white/5 transition-all ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
+                  <span className="text-xs text-gray-500 font-mono">{newPost.length}/2000</span>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!newPost.trim()}
+                    className="btn-primary px-8 py-3 rounded-xl font-bold text-sm disabled:opacity-50"
+                  >
+                    نشر الفكرة 💡
+                  </button>
                 </div>
-                <button onClick={() => setTasks(tasks.filter(x => x.id !== t.id))} className="text-red-500 opacity-0 hover:opacity-100 transition-opacity font-bold text-xs">حذف</button>
+              </div>
+            </div>
+          </div>
+
+          {/* Posts Feed */}
+          <div className="space-y-6">
+            {posts.length === 0 ? (
+              <div className="text-center py-20 text-gray-500">
+                <div className="text-6xl mb-4">📝</div>
+                <p className="font-bold">لا توجد أفكار بعد</p>
+                <p className="text-sm">كن أول من يشارك فكرة!</p>
+              </div>
+            ) : (
+              posts.map((post) => (
+                <article key={post.id} className="modern-card p-6 md:p-8">
+                  <header className="flex items-center gap-4 mb-6">
+                    <Avatar name={post.author} size="md" />
+                    <div className="flex-1">
+                      <h3 className="font-bold text-lg">{post.author}</h3>
+                      <time className="text-xs text-gray-500 font-mono">{formatTime(post.timestamp)}</time>
+                    </div>
+                    <button className="text-gray-500 hover:text-white transition-colors">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                      </svg>
+                    </button>
+                  </header>
+
+                  <p className="text-gray-200 leading-relaxed text-lg mb-6 whitespace-pre-wrap">{post.content}</p>
+
+                  <div className="flex items-center gap-6 py-4 border-t border-b border-white/5 mb-6">
+                    <button className="flex items-center gap-2 text-gray-400 hover:text-brand transition-colors group">
+                      <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                      <span className="text-sm font-bold">{post.likes || 0}</span>
+                    </button>
+                    <button className="flex items-center gap-2 text-gray-400 hover:text-brand transition-colors">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                      <span className="text-sm font-bold">{post.comments?.length || 0} تعليقات</span>
+                    </button>
+                    <button className="flex items-center gap-2 text-gray-400 hover:text-brand transition-colors mr-auto">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Comments */}
+                  <div className="space-y-4">
+                    {post.comments?.map((comment) => (
+                      <div key={comment.id} className="flex gap-3 animate-fadeIn">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex-shrink-0" />
+                        <div className="flex-1 bg-white/5 rounded-2xl px-4 py-3">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs font-bold text-brand">{comment.user}</span>
+                            <span className="text-[10px] text-gray-500">{formatTime(comment.timestamp)}</span>
+                          </div>
+                          <p className="text-sm text-gray-300">{comment.text}</p>
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className="flex gap-3 mt-4">
+                      <Avatar name={user?.name} size="sm" />
+                      <input
+                        type="text"
+                        placeholder="أضف تعليقاً..."
+                        maxLength={500}
+                        className="modern-input flex-1 px-4 py-3 rounded-2xl text-sm outline-none"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && e.target.value.trim()) {
+                            addComment(post.id, e.target.value);
+                            e.target.value = '';
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    const TasksPage = () => {
+      const { tasks, addTask, toggleTask, deleteTask } = useContext(AppContext);
+      const [input, setInput] = useState('');
+      const [filter, setFilter] = useState('all'); // all, active, completed
+
+      const filteredTasks = useMemo(() => {
+        switch (filter) {
+          case 'active': return tasks.filter(t => !t.done);
+          case 'completed': return tasks.filter(t => t.done);
+          default: return tasks;
+        }
+      }, [tasks, filter]);
+
+      const stats = useMemo(() => ({
+        total: tasks.length,
+        completed: tasks.filter(t => t.done).length,
+        active: tasks.filter(t => !t.done).length
+      }), [tasks]);
+
+      const handleAdd = () => {
+        if (!input.trim()) return;
+        addTask(input);
+        setInput('');
+      };
+
+      return (
+        <div className="page-enter max-w-4xl mx-auto task-container">
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-4 mb-8">
+            <div className="modern-card p-6 text-center">
+              <div className="text-3xl font-black text-brand mb-1">{stats.total}</div>
+              <div className="text-xs text-gray-500 font-bold">إجمالي المهام</div>
+            </div>
+            <div className="modern-card p-6 text-center">
+              <div className="text-3xl font-black text-green-500 mb-1">{stats.completed}</div>
+              <div className="text-xs text-gray-500 font-bold">مكتملة</div>
+            </div>
+            <div className="modern-card p-6 text-center">
+              <div className="text-3xl font-black text-orange-500 mb-1">{stats.active}</div>
+              <div className="text-xs text-gray-500 font-bold">قيد التنفيذ</div>
+            </div>
+          </div>
+
+          {/* Input */}
+          <div className="modern-card p-4 mb-6">
+            <div className="flex gap-3">
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+                placeholder="ما هي المهمة القادمة؟"
+                maxLength={200}
+                className="modern-input flex-1 px-6 py-4 rounded-2xl font-bold outline-none"
+              />
+              <button
+                onClick={handleAdd}
+                disabled={!input.trim()}
+                className="btn-primary px-8 py-4 rounded-2xl font-bold disabled:opacity-50"
+              >
+                إضافة +
+              </button>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+            {['all', 'active', 'completed'].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-6 py-2 rounded-full font-bold text-sm transition-all ${filter === f
+                    ? 'bg-brand text-white shadow-lg shadow-brand/30'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                  }`}
+              >
+                {f === 'all' ? 'الكل' : f === 'active' ? 'قيد التنفيذ' : 'مكتملة'}
+              </button>
+            ))}
+          </div>
+
+          {/* Tasks List */}
+          <div className="space-y-3">
+            {filteredTasks.length === 0 ? (
+              <div className="text-center py-16 text-gray-500">
+                <div className="text-5xl mb-4">📋</div>
+                <p className="font-bold">لا توجد مهام</p>
+              </div>
+            ) : (
+              filteredTasks.map((task) => (
+                <div
+                  key={task.id}
+                  className={`task-item modern-card p-5 flex items-center gap-4 group ${task.done ? 'opacity-50' : ''
+                    }`}
+                >
+                  <button
+                    onClick={() => toggleTask(task.id)}
+                    className={`w-6 h-6 rounded-xl border-2 flex items-center justify-center transition-all ${task.done
+                        ? 'bg-green-500 border-green-500 text-white'
+                        : 'border-gray-600 hover:border-brand'
+                      }`}
+                  >
+                    {task.done && '✓'}
+                  </button>
+
+                  <span className={`flex-1 font-bold ${task.done ? 'line-through text-gray-500' : ''}`}>
+                    {task.text}
+                  </span>
+
+                  <button
+                    onClick={() => deleteTask(task.id)}
+                    className="opacity-0 group-hover:opacity-100 transition-all text-red-500 hover:bg-red-500/10 p-2 rounded-xl"
+                    title="حذف"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    const TeamPage = () => {
+      const { members } = useContext(AppContext);
+
+      return (
+        <div className="page-enter max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {members.map((member) => (
+              <div key={member.id} className="modern-card p-6 group">
+                <div className="flex items-center gap-4 mb-6">
+                  <Avatar name={member.avatar} size="lg" status={member.status} />
+                  <div>
+                    <h3 className="font-bold text-lg">{member.name}</h3>
+                    <p className="text-sm text-brand font-medium">{member.role}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${member.status === 'online' ? 'bg-green-500 animate-pulse' :
+                        member.status === 'away' ? 'bg-orange-500' : 'bg-gray-500'
+                      }`} />
+                    <span className="text-xs text-gray-400 font-bold">
+                      {member.status === 'online' ? 'متصل الآن' :
+                        member.status === 'away' ? 'بعيد' : 'غير متصل'}
+                    </span>
+                  </div>
+
+                  <button className="opacity-0 group-hover:opacity-100 transition-all bg-white/5 hover:bg-brand hover:text-white px-4 py-2 rounded-xl text-sm font-bold">
+                    مراسلة
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -180,92 +1085,115 @@
       );
     };
 
-    // --- المكون الرئيسي ---
-    const App = () => {
-      const { user, setUser, view, setView, isDark, setIsDark, posts, setPosts } = useContext(AppContext);
-      const [postInput, setPostInput] = useState("");
+    // ==========================================
+    // MAIN APP
+    // ==========================================
 
-      if (!user) return (
-        <div className="min-h-screen flex items-center justify-center p-6 bg-slate-100 dark:bg-black">
-          <div className="bg-white dark:bg-cardDark p-12 rounded-[3rem] shadow-2xl w-full max-w-sm text-center page-transition">
-            <div className="text-6xl mb-6 animate-bounce">🚀</div>
-            <h2 className="text-3xl font-black mb-2 tracking-tighter text-brand">DevHub Elite</h2>
-            <p className="text-gray-500 mb-10 text-sm font-medium">مساحة عمل مخصصة للمحترفين</p>
-            <input id="userName" placeholder="اكتب اسمك للدخول" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 mb-6 text-center font-bold outline-none border-2 border-transparent focus:border-brand transition-all" />
-            <button onClick={() => { const n = document.getElementById('userName').value; if (n) setUser({ name: n }) }} className="w-full bg-brand text-white p-5 rounded-2xl font-black shadow-xl shadow-brand/30 hover:scale-[1.02] active:scale-95 transition-all">ابدأ الآن</button>
-          </div>
-        </div>
-      );
+    const Sidebar = () => {
+      const { user, logout, view, tasks } = useContext(AppContext);
+      const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+      const pendingTasks = tasks.filter(t => !t.done).length;
 
       return (
-        <div className="min-h-screen flex flex-col md:flex-row">
-          {/* القائمة الجانبية - Sidebar */}
-          <aside className="w-full md:w-72 bg-white dark:bg-cardDark border-l dark:border-gray-800 p-6 flex flex-col gap-8 z-40">
-            <div className="text-2xl font-black text-brand tracking-tighter">DEV_ELITE</div>
-            <div className="flex flex-col gap-2">
-              <SidebarItem id="feed" icon="🏠" label="الرئيسية" />
-              <SidebarItem id="tasks" icon="📋" label="المهام" />
-              <SidebarItem id="team" icon="👥" label="الفريق" />
-            </div>
-            <div className="mt-auto pt-6 border-t dark:border-gray-800">
-              <button onClick={() => setIsDark(!isDark)} className="w-full p-4 rounded-2xl bg-gray-50 dark:bg-gray-800 font-bold mb-4">
-                {isDark ? '☀️ الوضع الفاتح' : '🌙 الوضع الليلي'}
+        <>
+          {/* Mobile Header */}
+          <div className="lg:hidden glass fixed top-0 left-0 right-0 z-40 px-4 py-3 flex items-center justify-between">
+            <span className="text-xl font-black gradient-text">DEV_ELITE</span>
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-xl bg-white/5"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Sidebar */}
+          <aside className={`
+            fixed lg:static inset-y-0 right-0 z-50 w-72 glass border-l border-white/5 p-6 flex flex-col
+            transform transition-transform duration-300 lg:transform-none
+            ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+          `}>
+            <div className="flex items-center justify-between mb-8">
+              <span className="text-2xl font-black gradient-text tracking-tighter">DEV_ELITE</span>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="lg:hidden p-2 rounded-xl bg-white/5"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
-              <button onClick={() => setUser(null)} className="w-full p-4 text-red-500 font-bold hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all text-sm">تسجيل الخروج</button>
+            </div>
+
+            <nav className="flex-1 space-y-2">
+              <SidebarItem id="feed" icon="🏠" label="الرئيسية" />
+              <SidebarItem id="tasks" icon="📋" label="المهام" count={pendingTasks} />
+              <SidebarItem id="team" icon="👥" label="الفريق" />
+            </nav>
+
+            <div className="pt-6 border-t border-white/5 space-y-3">
+              <div className="flex items-center gap-3 p-4 rounded-2xl bg-white/5">
+                <Avatar name={user?.name} size="sm" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-sm truncate">{user?.name}</p>
+                  <p className="text-xs text-gray-500">متصل</p>
+                </div>
+              </div>
+
+              <button
+                onClick={logout}
+                className="w-full p-4 rounded-2xl bg-red-500/10 text-red-500 font-bold hover:bg-red-500/20 transition-all flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                تسجيل الخروج
+              </button>
             </div>
           </aside>
 
-          {/* المحتوى الرئيسي */}
-          <main className="flex-1 p-6 md:p-12 custom-scrollbar overflow-y-auto">
-            {view === 'feed' && (
-              <div className="page-transition max-w-2xl mx-auto">
-                <div className="bg-white dark:bg-cardDark p-6 rounded-[2.5rem] shadow-xl mb-10 border dark:border-gray-800">
-                  <textarea value={postInput} onChange={e => setPostInput(e.target.value)} className="w-full h-32 bg-transparent outline-none text-lg font-medium resize-none" placeholder={`ما الجديد في مشروعنا يا ${user.name}؟`}></textarea>
-                  <div className="flex justify-end pt-4 border-t dark:border-gray-800">
-                    <button onClick={() => { if (postInput) { setPosts([{ id: Date.now(), author: user.name, content: postInput, comments: [] }, ...posts]); setPostInput(""); } }} className="bg-brand text-white px-10 py-3 rounded-2xl font-black shadow-lg shadow-brand/20 hover:opacity-90 active:scale-95 transition-all">نشر الفكرة</button>
-                  </div>
-                </div>
-                {posts.map(post => (
-                  <div key={post.id} className="bg-white dark:bg-cardDark p-8 rounded-[2.5rem] mb-8 border dark:border-gray-800 card-anim">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-12 h-12 rounded-2xl bg-brand/10 text-brand flex items-center justify-center font-black text-xl">{post.author[0]}</div>
-                      <div><h4 className="font-bold">{post.author}</h4><p className="text-[10px] text-gray-400 font-mono">ID: {post.id.toString().slice(-5)}</p></div>
-                    </div>
-                    <p className="text-gray-800 dark:text-gray-200 text-lg leading-relaxed mb-8">{post.content}</p>
-                    <div className="pt-6 border-t dark:border-gray-800">
-                      <div className="space-y-4">
-                        {post.comments.map(c => (
-                          <div key={c.id} className="flex gap-3 items-start animate-fadeIn">
-                            <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex-shrink-0"></div>
-                            <div className="bg-gray-50 dark:bg-gray-800/50 px-5 py-3 rounded-[1.5rem] flex-1">
-                              <div className="text-[10px] font-bold text-brand mb-1 uppercase tracking-widest">{c.user}</div>
-                              <div className="text-sm font-medium">{c.text}</div>
-                            </div>
-                          </div>
-                        ))}
-                        <input placeholder="أضف تعليقاً واضغط Enter..." className="w-full bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl text-xs font-bold outline-none focus:ring-1 focus:ring-brand"
-                          onKeyDown={e => {
-                            if (e.key === 'Enter' && e.target.value) {
-                              setPosts(posts.map(p => p.id === post.id ? { ...p, comments: [...p.comments, { id: Date.now(), user: user.name, text: e.target.value }] } : p));
-                              e.target.value = "";
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            {view === 'tasks' && <TasksPage />}
-            {view === 'team' && <TeamPage />}
+          {/* Mobile Overlay */}
+          {isMobileMenuOpen && (
+            <div
+              className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+          )}
+        </>
+      );
+    };
+
+    const App = () => {
+      const { user, view } = useContext(AppContext);
+
+      if (!user) {
+        return <LoginPage />;
+      }
+
+      return (
+        <div className="min-h-screen flex flex-col lg:flex-row">
+          <Sidebar />
+
+          <main className="flex-1 p-4 lg:p-8 pt-20 lg:pt-8 overflow-x-hidden">
+            <div className="max-w-6xl mx-auto">
+              {view === 'feed' && <FeedPage />}
+              {view === 'tasks' && <TasksPage />}
+              {view === 'team' && <TeamPage />}
+            </div>
           </main>
         </div>
       );
     };
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<AppProvider><App /></AppProvider>);
+    root.render(
+      <AppProvider>
+        <App />
+      </AppProvider>
+    );
   </script>
 </body>
 
