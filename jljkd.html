@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="description" content="IdeaFlow - A collaborative platform for team idea sharing and innovation">
+    <meta name="theme-color" content="#6366f1">
+    <title>IdeaFlow | Team Collaboration Platform</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81' },
+                        secondary: { 50: '#fdf4ff', 100: '#fae8ff', 200: '#f5d0fe', 300: '#f0abfc', 400: '#e879f9', 500: '#d946ef', 600: '#c026d3', 700: '#a21caf', 800: '#86198f', 900: '#701a75' },
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                        dark: { bg: '#0f172a', card: '#1e293b', border: '#334155' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: #1e293b;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .dark body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 100px; border: 2px solid transparent; background-clip: padding-box; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .dark .glass {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Card Styles */
+        .idea-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark .idea-card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        .idea-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.2);
+            border-color: #6366f1;
+        }
+
+        .idea-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #6366f1, #d946ef, #6366f1);
+            background-size: 200% 100%;
+            animation: gradientFlow 3s ease infinite;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .idea-card:hover::before { opacity: 1; }
+
+        @keyframes gradientFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .animate-fadeInUp { animation: fadeInUp 0.5s ease forwards; }
+        .animate-slideIn { animation: slideIn 0.4s ease forwards; }
+        .animate-pulse-slow { animation: pulse 2s ease-in-out infinite; }
+
+        /* Status Badges */
+        .status-new { background: linear-gradient(135deg, #10b981, #059669); }
+        .status-reviewing { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .status-discussing { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+        .status-implemented { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .status-archived { background: linear-gradient(135deg, #64748b, #475569); }
+
+        /* Button Effects */
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::after { left: 100%; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4); }
+
+        /* Input Styles */
+        .modern-input {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .dark .modern-input {
+            background: #334155;
+            border-color: #475569;
+            color: white;
+        }
+
+        .modern-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            outline: none;
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 16px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .toast.show { transform: translateX(0); }
+        .toast-success { background: linear-gradient(135deg, #10b981, #059669); }
+        .toast-error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .toast-info { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+
+        /* Tutorial Overlay */
+        .tutorial-highlight {
+            position: relative;
+            z-index: 50;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.5), 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+        }
+
+        /* Filter Chips */
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .filter-chip.active {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+
+        .filter-chip:not(.active) {
+            background: #f1f5f9;
+            color: #64748b;
+            border-color: #e2e8f0;
+        }
+
+        .dark .filter-chip:not(.active) {
+            background: #334155;
+            color: #94a3b8;
+            border-color: #475569;
+        }
+
+        .filter-chip:not(.active):hover {
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+
+        /* Attachment Preview */
+        .attachment-preview {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            margin: 4px;
+        }
+
+        .dark .attachment-preview { background: #334155; }
+
+        /* Discussion Thread */
+        .discussion-thread {
+            border-right: 3px solid #e2e8f0;
+            margin-right: 20px;
+            padding-right: 20px;
+        }
+
+        .dark .discussion-thread { border-color: #334155; }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .glass { backdrop-filter: blur(10px); }
+            .idea-card { border-radius: 16px; }
+            .toast { left: 20px; right: 20px; transform: translateY(-100px); }
+            .toast.show { transform: translateY(0); }
+        }
+
+        /* Print Styles */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Tutorial Overlay -->
+    <div id="tutorialOverlay" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm transition-opacity duration-300"></div>
+
+    <!-- App Container -->
+    <div id="app"></div>
+
+    <script>
+        /**
+         * IdeaFlow - Team Idea Sharing Platform
+         * A secure, scalable SPA for team collaboration and innovation
+         */
+
+        // ==========================================
+        // SECURITY & ENCRYPTION UTILITIES
+        // ==========================================
+
+        const SecurityUtils = {
+            // Generate secure random ID
+            generateId: () => {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+            },
+
+            // Simple XOR encryption for localStorage (obfuscation layer)
+            encrypt: (data, key = 'ideaflow_secure_key_2024') => {
+                try {
+                    const str = JSON.stringify(data);
+                    let encrypted = '';
+                    for (let i = 0; i < str.length; i++) {
+                        encrypted += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+                    }
+                    return btoa(encrypted);
+                } catch (e) {
+                    console.error('Encryption error:', e);
+                    return null;
+                }
+            },
+
+            decrypt: (encrypted, key = 'ideaflow_secure_key_2024') => {
+                try {
+                    const str = atob(encrypted);
+                    let decrypted = '';
+                    for (let i = 0; i < str.length; i++) {
+                        decrypted += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+                    }
+                    return JSON.parse(decrypted);
+                } catch (e) {
+                    console.error('Decryption error:', e);
+                    return null;
+                }
+            },
+
+            // XSS Protection - Sanitize all user inputs
+            sanitize: (input) => {
+                if (typeof input !== 'string') return input;
+                const div = document.createElement('div');
+                div.textContent = input;
+                return div.innerHTML
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#x27;')
+                    .replace(/\//g, '&#x2F;');
+            },
+
+            // Validate file types
+            validateFile: (file) => {
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'text/plain'];
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                return allowedTypes.includes(file.type) && file.size <= maxSize;
+            }
+        };
+
+        // ==========================================
+        // STATE MANAGEMENT (Vanilla JS Store)
+        // ==========================================
+
+        const Store = {
+            data: {
+                currentUser: null,
+                ideas: [],
+                notifications: [],
+                filter: 'all',
+                sortBy: 'newest',
+                view: 'dashboard',
+                darkMode: false,
+                tutorialCompleted: false
+            },
+
+            listeners: [],
+
+            // Initialize with encrypted localStorage
+            init() {
+                const encryptedUser = localStorage.getItem('ideaflow_user');
+                const encryptedIdeas = localStorage.getItem('ideaflow_ideas');
+                const encryptedSettings = localStorage.getItem('ideaflow_settings');
+
+                if (encryptedUser) {
+                    this.data.currentUser = SecurityUtils.decrypt(encryptedUser);
+                }
+                if (encryptedIdeas) {
+                    this.data.ideas = SecurityUtils.decrypt(encryptedIdeas) || [];
+                }
+                if (encryptedSettings) {
+                    const settings = SecurityUtils.decrypt(encryptedSettings);
+                    if (settings) {
+                        this.data.darkMode = settings.darkMode || false;
+                        this.data.tutorialCompleted = settings.tutorialCompleted || false;
+                    }
+                }
+
+                // Apply dark mode
+                if (this.data.darkMode) {
+                    document.documentElement.classList.add('dark');
+                }
+            },
+
+            // Subscribe to changes
+            subscribe(listener) {
+                this.listeners.push(listener);
+                return () => {
+                    this.listeners = this.listeners.filter(l => l !== listener);
+                };
+            },
+
+            // Notify all listeners
+            notify() {
+                this.listeners.forEach(listener => listener(this.data));
+            },
+
+            // Setters with persistence
+            setUser(user) {
+                this.data.currentUser = user;
+                if (user) {
+                    localStorage.setItem('ideaflow_user', SecurityUtils.encrypt(user));
+                } else {
+                    localStorage.removeItem('ideaflow_user');
+                }
+                this.notify();
+            },
+
+            setIdeas(ideas) {
+                this.data.ideas = ideas;
+                localStorage.setItem('ideaflow_ideas', SecurityUtils.encrypt(ideas));
+                this.notify();
+            },
+
+            addIdea(idea) {
+                idea.id = SecurityUtils.generateId();
+                idea.createdAt = Date.now();
+                idea.updatedAt = Date.now();
+                idea.status = 'new';
+                idea.comments = [];
+                idea.discussions = [];
+                idea.votes = 0;
+                idea.votedBy = [];
+                idea.views = 0;
+                idea.attachments = idea.attachments || [];
+
+                this.data.ideas.unshift(idea);
+                this.setIdeas(this.data.ideas);
+                this.addNotification(`New idea submitted: ${idea.title}`, 'success');
+            },
+
+            updateIdea(id, updates) {
+                const index = this.data.ideas.findIndex(i => i.id === id);
+                if (index !== -1) {
+                    this.data.ideas[index] = {
+                        ...this.data.ideas[index],
+                        ...updates,
+                        updatedAt: Date.now()
+                    };
+                    this.setIdeas(this.data.ideas);
+                }
+            },
+
+            addComment(ideaId, comment) {
+                const idea = this.data.ideas.find(i => i.id === ideaId);
+                if (idea) {
+                    comment.id = SecurityUtils.generateId();
+                    comment.createdAt = Date.now();
+                    idea.comments.push(comment);
+
+                    // Update status if first comment
+                    if (idea.comments.length === 1 && idea.status === 'new') {
+                        idea.status = 'reviewing';
+                    }
+
+                    this.setIdeas(this.data.ideas);
+                    this.addNotification(`New comment on "${idea.title}"`, 'info');
+                }
+            },
+
+            addDiscussion(ideaId, discussion) {
+                const idea = this.data.ideas.find(i => i.id === ideaId);
+                if (idea) {
+                    discussion.id = SecurityUtils.generateId();
+                    discussion.createdAt = Date.now();
+                    idea.discussions.push(discussion);
+                    idea.status = 'discussing';
+                    this.setIdeas(this.data.ideas);
+                }
+            },
+
+            voteIdea(ideaId, userId) {
+                const idea = this.data.ideas.find(i => i.id === ideaId);
+                if (idea && !idea.votedBy.includes(userId)) {
+                    idea.votes++;
+                    idea.votedBy.push(userId);
+                    this.setIdeas(this.data.ideas);
+                    return true;
+                }
+                return false;
+            },
+
+            deleteIdea(id) {
+                this.data.ideas = this.data.ideas.filter(i => i.id !== id);
+                this.setIdeas(this.data.ideas);
+                this.addNotification('Idea deleted', 'info');
+            },
+
+            addNotification(message, type = 'info') {
+                const notification = {
+                    id: SecurityUtils.generateId(),
+                    message,
+                    type,
+                    createdAt: Date.now(),
+                    read: false
+                };
+                this.data.notifications.unshift(notification);
+                this.notify();
+
+                // Show toast
+                UI.showToast(message, type);
+            },
+
+            markNotificationRead(id) {
+                const notif = this.data.notifications.find(n => n.id === id);
+                if (notif) notif.read = true;
+                this.notify();
+            },
+
+            setFilter(filter) {
+                this.data.filter = filter;
+                this.notify();
+            },
+
+            setSort(sortBy) {
+                this.data.sortBy = sortBy;
+                this.notify();
+            },
+
+            setView(view) {
+                this.data.view = view;
+                this.notify();
+            },
+
+            toggleDarkMode() {
+                this.data.darkMode = !this.data.darkMode;
+                document.documentElement.classList.toggle('dark');
+                localStorage.setItem('ideaflow_settings', SecurityUtils.encrypt({
+                    darkMode: this.data.darkMode,
+                    tutorialCompleted: this.data.tutorialCompleted
+                }));
+                this.notify();
+            },
+
+            completeTutorial() {
+                this.data.tutorialCompleted = true;
+                localStorage.setItem('ideaflow_settings', SecurityUtils.encrypt({
+                    darkMode: this.data.darkMode,
+                    tutorialCompleted: true
+                }));
+                this.notify();
+            }
+        };
+
+        // ==========================================
+        // UI COMPONENTS
+        // ==========================================
+
+        const UI = {
+            // Show toast notification
+            showToast(message, type = 'info', duration = 3000) {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                toast.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span>
+                        <span>${SecurityUtils.sanitize(message)}</span>
+                    </div>
+                `;
+                container.appendChild(toast);
+
+                // Trigger animation
+                setTimeout(() => toast.classList.add('show'), 10);
+
+                // Remove after duration
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 400);
+                }, duration);
+            },
+
+            // Format relative time
+            timeAgo(timestamp) {
+                const seconds = Math.floor((Date.now() - timestamp) / 1000);
+                if (seconds < 60) return 'Just now';
+                const minutes = Math.floor(seconds / 60);
+                if (minutes < 60) return `${minutes}m ago`;
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return `${hours}h ago`;
+                const days = Math.floor(hours / 24);
+                if (days < 7) return `${days}d ago`;
+                return new Date(timestamp).toLocaleDateString();
+            },
+
+            // Format number with k/m suffix
+            formatNumber(num) {
+                if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+                if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+                return num.toString();
+            },
+
+            // Get status color class
+            getStatusClass(status) {
+                const classes = {
+                    'new': 'status-new',
+                    'reviewing': 'status-reviewing',
+                    'discussing': 'status-discussing',
+                    'implemented': 'status-implemented',
+                    'archived': 'status-archived'
+                };
+                return classes[status] || 'status-new';
+            },
+
+            // Get status label
+            getStatusLabel(status) {
+                const labels = {
+                    'new': 'New',
+                    'reviewing': 'Under Review',
+                    'discussing': 'In Discussion',
+                    'implemented': 'Implemented',
+                    'archived': 'Archived'
+                };
+                return labels[status] || status;
+            }
+        };
+
+        // ==========================================
+        // SAMPLE DATA
+        // ==========================================
+
+        const SampleData = {
+            ideas: [
+                {
+                    id: 'sample-1',
+                    title: 'AI-Powered Code Review Assistant',
+                    description: 'Develop an AI tool that automatically reviews code submissions, suggests improvements, and detects potential bugs before human review. This would significantly speed up our development process and improve code quality.',
+                    author: 'Sarah Chen',
+                    authorId: 'user-1',
+                    createdAt: Date.now() - 86400000 * 2,
+                    updatedAt: Date.now() - 86400000 * 2,
+                    status: 'discussing',
+                    votes: 24,
+                    votedBy: ['user-2', 'user-3', 'user-4'],
+                    views: 156,
+                    comments: [
+                        {
+                            id: 'c1',
+                            user: 'Mike Johnson',
+                            text: 'Great idea! We could integrate this with our existing CI/CD pipeline.',
+                            createdAt: Date.now() - 86400000
+                        },
+                        {
+                            id: 'c2',
+                            user: 'Emma Wilson',
+                            text: 'Should we consider using GitHub Copilot API or build our own model?',
+                            createdAt: Date.now() - 43200000
+                        }
+                    ],
+                    discussions: [
+                        {
+                            id: 'd1',
+                            user: 'Tech Lead',
+                            topic: 'Technical Architecture',
+                            message: 'We need to discuss the tech stack. Should we use Python/TensorFlow or stick with Node.js solutions?',
+                            createdAt: Date.now() - 3600000
+                        }
+                    ],
+                    attachments: [],
+                    tags: ['AI', 'Development', 'Automation']
+                },
+                {
+                    id: 'sample-2',
+                    title: 'Remote Team Virtual Coffee Breaks',
+                    description: 'A scheduled random pairing system for team members to have 15-minute virtual coffee breaks. This would help build stronger relationships in our remote-first culture.',
+                    author: 'Alex Rivera',
+                    authorId: 'user-2',
+                    createdAt: Date.now() - 86400000 * 5,
+                    updatedAt: Date.now() - 86400000,
+                    status: 'reviewing',
+                    votes: 18,
+                    votedBy: ['user-1', 'user-3'],
+                    views: 89,
+                    comments: [],
+                    discussions: [],
+                    attachments: [],
+                    tags: ['Culture', 'Remote Work', 'Team Building']
+                },
+                {
+                    id: 'sample-3',
+                    title: 'Customer Feedback Dashboard',
+                    description: 'Real-time dashboard showing customer feedback from all channels (support tickets, social media, reviews) with sentiment analysis and trend identification.',
+                    author: 'Jordan Park',
+                    authorId: 'user-3',
+                    createdAt: Date.now() - 172800000,
+                    updatedAt: Date.now() - 172800000,
+                    status: 'new',
+                    votes: 7,
+                    votedBy: [],
+                    views: 45,
+                    comments: [],
+                    discussions: [],
+                    attachments: [],
+                    tags: ['Customer Success', 'Analytics', 'Dashboard']
+                }
+            ]
+        };
+
+        // ==========================================
+        // MAIN APP COMPONENT
+        // ==========================================
+
+        const App = {
+            init() {
+                Store.init();
+
+                // Load sample data if empty
+                if (Store.data.ideas.length === 0) {
+                    Store.data.ideas = SampleData.ideas;
+                    Store.setIdeas(Store.data.ideas);
+                }
+
+                this.render();
+                Store.subscribe(() => this.render());
+
+                // Check for tutorial
+                if (!Store.data.tutorialCompleted && Store.data.currentUser) {
+                    setTimeout(() => this.startTutorial(), 1000);
+                }
+            },
+
+            render() {
+                const app = document.getElementById('app');
+
+                if (!Store.data.currentUser) {
+                    app.innerHTML = this.renderLogin();
+                    this.attachLoginListeners();
+                } else {
+                    app.innerHTML = this.renderMain();
+                    this.attachMainListeners();
+                }
+            },
+
+            renderLogin() {
+                return `
+                    <div class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+                        <!-- Background Decorations -->
+                        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                            <div class="absolute -top-40 -left-40 w-80 h-80 bg-primary-500/20 rounded-full blur-3xl animate-pulse-slow"></div>
+                            <div class="absolute -bottom-40 -right-40 w-80 h-80 bg-secondary-500/20 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 1s;"></div>
+                        </div>
+
+                        <div class="glass p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md relative z-10 animate-fadeInUp">
+                            <div class="text-center mb-8">
+                                <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-4xl shadow-xl shadow-primary-500/30">
+                                    💡
+                                </div>
+                                <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-2">
+                                    IdeaFlow
+                                </h1>
+                                <p class="text-gray-500 dark:text-gray-400">Where great ideas come to life</p>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Your Name</label>
+                                    <input type="text" id="loginName" class="modern-input w-full px-5 py-4 rounded-xl text-center font-semibold text-lg" placeholder="Enter your name" maxlength="50">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Role</label>
+                                    <select id="loginRole" class="modern-input w-full px-5 py-4 rounded-xl font-semibold">
+                                        <option value="Developer">Developer</option>
+                                        <option value="Designer">Designer</option>
+                                        <option value="Product Manager">Product Manager</option>
+                                        <option value="Team Lead">Team Lead</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+
+                                <button id="loginBtn" class="btn-primary w-full text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-primary-500/30">
+                                    Get Started 🚀
+                                </button>
+                            </div>
+
+                            <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                                <p class="text-xs text-center text-gray-500 dark:text-gray-400 leading-relaxed">
+                                    🔒 Your data is encrypted and stored locally.<br>
+                                    No server required - complete privacy.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderMain() {
+                const unreadCount = Store.data.notifications.filter(n => !n.read).length;
+
+                return `
+                    <div class="min-h-screen flex flex-col lg:flex-row">
+                        <!-- Sidebar -->
+                        <aside class="lg:w-72 glass lg:h-screen lg:sticky lg:top-0 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 flex-shrink-0 z-30">
+                            <div class="p-6">
+                                <div class="flex items-center gap-3 mb-8">
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-2xl shadow-lg">
+                                        💡
+                                    </div>
+                                    <div>
+                                        <h1 class="font-bold text-xl bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">IdeaFlow</h1>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Team Innovation Hub</p>
+                                    </div>
+                                </div>
+
+                                <nav class="space-y-2">
+                                    ${this.renderNavItem('dashboard', '📊', 'Dashboard', Store.data.view === 'dashboard')}
+                                    ${this.renderNavItem('ideas', '💡', 'All Ideas', Store.data.view === 'ideas')}
+                                    ${this.renderNavItem('new', '✨', 'New Ideas', Store.data.view === 'new', Store.data.ideas.filter(i => i.status === 'new').length)}
+                                    ${this.renderNavItem('my-ideas', '👤', 'My Ideas', Store.data.view === 'my-ideas')}
+                                    ${this.renderNavItem('discussions', '💬', 'Discussions', Store.data.view === 'discussions')}
+                                </nav>
+
+                                <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                                    <button id="toggleTheme" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm font-semibold text-gray-600 dark:text-gray-400">
+                                        ${Store.data.darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+                                    </button>
+                                    <button id="startTutorial" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm font-semibold text-gray-600 dark:text-gray-400 mt-2">
+                                        ❓ Help / Tutorial
+                                    </button>
+                                    <button id="logoutBtn" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 transition-colors text-sm font-semibold mt-2">
+                                        🚪 Sign Out
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- User Card -->
+                            <div class="p-4 mt-auto border-t border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white font-bold">
+                                        ${Store.data.currentUser.name[0].toUpperCase()}
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold text-sm truncate">${SecurityUtils.sanitize(Store.data.currentUser.name)}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">${Store.data.currentUser.role}</p>
+                                    </div>
+                                    ${unreadCount > 0 ? `<span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">${unreadCount}</span>` : ''}
+                                </div>
+                            </div>
+                        </aside>
+
+                        <!-- Main Content -->
+                        <main class="flex-1 min-h-screen">
+                            ${this.renderHeader()}
+                            ${this.renderContent()}
+                        </main>
+                    </div>
+                `;
+            },
+
+            renderNavItem(id, icon, label, active, badge = null) {
+                return `
+                    <button onclick="App.navigate('${id}')" class="w-full flex items-center gap-3 p-3 rounded-xl transition-all ${active ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'}">
+                        <span class="text-xl">${icon}</span>
+                        <span class="font-semibold text-sm">${label}</span>
+                        ${badge ? `<span class="ml-auto bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-full">${badge}</span>` : ''}
+                    </button>
+                `;
+            },
+
+            renderHeader() {
+                return `
+                    <header class="glass sticky top-0 z-20 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+                            <h2 class="text-2xl font-bold text-gray-800 dark:text-white capitalize">
+                                ${Store.data.view.replace('-', ' ')}
+                            </h2>
+
+                            <div class="flex items-center gap-3">
+                                <button onclick="App.showNewIdeaModal()" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold text-sm shadow-lg shadow-primary-500/30 flex items-center gap-2">
+                                    <span>+</span>
+                                    <span class="hidden sm:inline">Submit Idea</span>
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+                `;
+            },
+
+            renderContent() {
+                const view = Store.data.view;
+
+                if (view === 'dashboard') return this.renderDashboard();
+                if (view === 'ideas' || view === 'new' || view === 'my-ideas') return this.renderIdeasList();
+                if (view === 'discussions') return this.renderDiscussions();
+
+                return this.renderDashboard();
+            },
+
+            renderDashboard() {
+                const stats = this.calculateStats();
+                const recentIdeas = Store.data.ideas.slice(0, 3);
+
+                return `
+                    <div class="p-6 max-w-7xl mx-auto space-y-6 animate-fadeInUp">
+                        <!-- Welcome Banner -->
+                        <div class="glass rounded-2xl p-6 md:p-8 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 border border-primary-200 dark:border-primary-800">
+                            <h3 class="text-2xl font-bold mb-2">Welcome back, ${SecurityUtils.sanitize(Store.data.currentUser.name)}! 👋</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Your team has been busy. Here is what's happening today.</p>
+                        </div>
+
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            ${this.renderStatCard('Total Ideas', stats.total, '💡', 'primary')}
+                            ${this.renderStatCard('This Week', stats.thisWeek, '📈', 'success')}
+                            ${this.renderStatCard('In Discussion', stats.discussing, '💬', 'warning')}
+                            ${this.renderStatCard('Implemented', stats.implemented, '🚀', 'secondary')}
+                        </div>
+
+                        <!-- Quick Actions & Recent -->
+                        <div class="grid lg:grid-cols-3 gap-6">
+                            <!-- Recent Ideas -->
+                            <div class="lg:col-span-2 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="font-bold text-lg">Recent Ideas</h4>
+                                    <button onclick="App.navigate('ideas')" class="text-primary-600 dark:text-primary-400 text-sm font-semibold hover:underline">View All →</button>
+                                </div>
+                                ${recentIdeas.length === 0 ?
+                                    '<div class="text-center py-12 text-gray-500">No ideas yet. Be the first to share!</div>' :
+                                    recentIdeas.map(idea => this.renderIdeaCard(idea)).join('')
+                                }
+                            </div>
+
+                            <!-- Activity Feed -->
+                            <div class="space-y-4">
+                                <h4 class="font-bold text-lg">Latest Activity</h4>
+                                <div class="glass rounded-2xl p-4 space-y-3">
+                                    ${Store.data.notifications.slice(0, 5).map(n => `
+                                        <div class="flex items-start gap-3 p-3 rounded-xl ${n.read ? 'opacity-50' : 'bg-primary-50 dark:bg-primary-900/20'}">
+                                            <div class="w-2 h-2 rounded-full mt-2 ${n.type === 'success' ? 'bg-green-500' : n.type === 'error' ? 'bg-red-500' : 'bg-primary-500'}"></div>
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium">${SecurityUtils.sanitize(n.message)}</p>
+                                                <p class="text-xs text-gray-500 mt-1">${UI.timeAgo(n.createdAt)}</p>
+                                            </div>
+                                        </div>
+                                    `).join('') || '<p class="text-center text-gray-500 py-4">No recent activity</p>'}
+                                </div>
+
+                                <!-- Quick Tips -->
+                                <div class="glass rounded-2xl p-4 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800">
+                                    <h5 class="font-bold text-sm mb-2 flex items-center gap-2">
+                                        <span>💡</span> Pro Tip
+                                    </h5>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                                        Ideas with clear titles and detailed descriptions get 3x more engagement from team members.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderStatCard(label, value, icon, color) {
+                const colors = {
+                    primary: 'from-primary-500 to-primary-600',
+                    success: 'from-green-500 to-green-600',
+                    warning: 'from-amber-500 to-amber-600',
+                    secondary: 'from-secondary-500 to-secondary-600'
+                };
+
+                return `
+                    <div class="glass rounded-2xl p-4 md:p-6 hover:shadow-lg transition-shadow">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-2xl">${icon}</span>
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br ${colors[color]} opacity-20"></div>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-800 dark:text-white">${UI.formatNumber(value)}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">${label}</p>
+                    </div>
+                `;
+            },
+
+            renderIdeasList() {
+                let ideas = Store.data.ideas;
+
+                // Filter
+                if (Store.data.view === 'new') {
+                    ideas = ideas.filter(i => i.status === 'new');
+                } else if (Store.data.view === 'my-ideas') {
+                    ideas = ideas.filter(i => i.authorId === Store.data.currentUser.id || i.author === Store.data.currentUser.name);
+                } else if (Store.data.filter !== 'all') {
+                    ideas = ideas.filter(i => i.status === Store.data.filter);
+                }
+
+                // Sort
+                ideas = [...ideas].sort((a, b) => {
+                    switch(Store.data.sortBy) {
+                        case 'newest': return b.createdAt - a.createdAt;
+                        case 'oldest': return a.createdAt - b.createdAt;
+                        case 'popular': return b.votes - a.votes;
+                        case 'comments': return (b.comments?.length || 0) - (a.comments?.length || 0);
+                        default: return b.createdAt - a.createdAt;
+                    }
+                });
+
+                return `
+                    <div class="p-6 max-w-7xl mx-auto animate-fadeInUp">
+                        <!-- Filters -->
+                        <div class="flex flex-wrap items-center gap-3 mb-6">
+                            <span class="text-sm font-semibold text-gray-500 dark:text-gray-400">Filter:</span>
+                            ${['all', 'new', 'reviewing', 'discussing', 'implemented'].map(f => `
+                                <button onclick="App.setFilter('${f}')" class="filter-chip ${Store.data.filter === f ? 'active' : ''}">
+                                    ${f.charAt(0).toUpperCase() + f.slice(1)}
+                                </button>
+                            `).join('')}
+
+                            <div class="ml-auto flex items-center gap-2">
+                                <span class="text-sm font-semibold text-gray-500 dark:text-gray-400">Sort:</span>
+                                <select onchange="App.setSort(this.value)" class="modern-input px-4 py-2 rounded-lg text-sm font-medium">
+                                    <option value="newest" ${Store.data.sortBy === 'newest' ? 'selected' : ''}>Newest First</option>
+                                    <option value="oldest" ${Store.data.sortBy === 'oldest' ? 'selected' : ''}>Oldest First</option>
+                                    <option value="popular" ${Store.data.sortBy === 'popular' ? 'selected' : ''}>Most Popular</option>
+                                    <option value="comments" ${Store.data.sortBy === 'comments' ? 'selected' : ''}>Most Discussed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Ideas Grid -->
+                        ${ideas.length === 0 ? `
+                            <div class="text-center py-20">
+                                <div class="text-6xl mb-4">📝</div>
+                                <h3 class="text-xl font-bold mb-2">No ideas found</h3>
+                                <p class="text-gray-500 mb-6">Be the first to share your brilliant idea!</p>
+                                <button onclick="App.showNewIdeaModal()" class="btn-primary text-white px-8 py-3 rounded-xl font-semibold">
+                                    Submit Idea
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="grid gap-6">
+                                ${ideas.map(idea => this.renderIdeaCard(idea)).join('')}
+                            </div>
+                        `}
+                    </div>
+                `;
+            },
+
+            renderIdeaCard(idea) {
+                const isOwner = idea.author === Store.data.currentUser.name || idea.authorId === Store.data.currentUser.id;
+                const hasVoted = idea.votedBy?.includes(Store.data.currentUser.id || Store.data.currentUser.name);
+
+                return `
+                    <article class="idea-card p-6 md:p-8" id="idea-${idea.id}">
+                        <div class="flex items-start justify-between gap-4 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white font-bold text-lg">
+                                    ${idea.author[0].toUpperCase()}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors" onclick="App.viewIdeaDetail('${idea.id}')">
+                                        ${SecurityUtils.sanitize(idea.title)}
+                                    </h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        By ${SecurityUtils.sanitize(idea.author)} • ${UI.timeAgo(idea.createdAt)}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold text-white ${UI.getStatusClass(idea.status)}">
+                                    ${UI.getStatusLabel(idea.status)}
+                                </span>
+                                ${isOwner ? `
+                                    <button onclick="App.deleteIdea('${idea.id}')" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Delete">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-4 line-clamp-3">
+                            ${SecurityUtils.sanitize(idea.description)}
+                        </p>
+
+                        ${idea.tags?.length ? `
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                ${idea.tags.map(tag => `
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">
+                                        #${SecurityUtils.sanitize(tag)}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
+                        ${idea.attachments?.length ? `
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                ${idea.attachments.map(att => `
+                                    <div class="attachment-preview">
+                                        <span>📎</span>
+                                        <span class="font-medium text-sm">${SecurityUtils.sanitize(att.name)}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center gap-6">
+                                <button onclick="App.voteIdea('${idea.id}')" class="flex items-center gap-2 ${hasVoted ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'} hover:text-primary-600 transition-colors">
+                                    <svg class="w-5 h-5 ${hasVoted ? 'fill-current' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                    </svg>
+                                    <span class="font-semibold">${idea.votes || 0}</span>
+                                </button>
+
+                                <button onclick="App.viewIdeaDetail('${idea.id}')" class="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-primary-600 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                    </svg>
+                                    <span class="font-semibold">${idea.comments?.length || 0}</span>
+                                </button>
+
+                                <span class="flex items-center gap-2 text-gray-400 text-sm">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                    ${idea.views || 0}
+                                </span>
+                            </div>
+
+                            ${idea.status === 'new' && (idea.comments?.length === 0) ? `
+                                <button onclick="App.startDiscussion('${idea.id}')" class="text-sm font-semibold text-primary-600 dark:text-primary-400 hover:underline">
+                                    Start Discussion →
+                                </button>
+                            ` : ''}
+                        </div>
+                    </article>
+                `;
+            },
+
+            renderDiscussions() {
+                const ideasWithDiscussions = Store.data.ideas.filter(i => i.discussions?.length > 0);
+
+                return `
+                    <div class="p-6 max-w-7xl mx-auto animate-fadeInUp">
+                        <h3 class="text-2xl font-bold mb-6">Active Discussions</h3>
+
+                        ${ideasWithDiscussions.length === 0 ? `
+                            <div class="text-center py-20">
+                                <div class="text-6xl mb-4">💬</div>
+                                <h3 class="text-xl font-bold mb-2">No active discussions</h3>
+                                <p class="text-gray-500">Start a discussion on any idea to collaborate deeper</p>
+                            </div>
+                        ` : `
+                            <div class="space-y-6">
+                                ${ideasWithDiscussions.map(idea => `
+                                    <div class="idea-card p-6">
+                                        <h4 class="font-bold text-lg mb-2">${SecurityUtils.sanitize(idea.title)}</h4>
+                                        <div class="discussion-thread space-y-4">
+                                            ${idea.discussions.map(d => `
+                                                <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4">
+                                                    <div class="flex items-center gap-2 mb-2">
+                                                        <span class="font-semibold text-sm text-primary-600 dark:text-primary-400">${SecurityUtils.sanitize(d.user)}</span>
+                                                        <span class="text-xs text-gray-500">• ${UI.timeAgo(d.createdAt)}</span>
+                                                    </div>
+                                                    <h5 class="font-bold text-sm mb-1">${SecurityUtils.sanitize(d.topic)}</h5>
+                                                    <p class="text-sm text-gray-600 dark:text-gray-400">${SecurityUtils.sanitize(d.message)}</p>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `}
+                    </div>
+                `;
+            },
+
+            // ==========================================
+            // MODALS & OVERLAYS
+            // ==========================================
+
+            showNewIdeaModal() {
+                const modal = document.createElement('div');
+                modal.id = 'newIdeaModal';
+                modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeInUp';
+                modal.innerHTML = `
+                    <div class="glass rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8 animate-slideIn">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-2xl font-bold">Submit New Idea 💡</h3>
+                            <button onclick="App.closeModal()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <form id="newIdeaForm" class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">Title *</label>
+                                <input type="text" id="ideaTitle" required maxlength="100" class="modern-input w-full px-4 py-3 rounded-xl" placeholder="Give your idea a clear, catchy title">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">Description *</label>
+                                <textarea id="ideaDescription" required maxlength="2000" rows="5" class="modern-input w-full px-4 py-3 rounded-xl resize-none" placeholder="Describe your idea in detail. What problem does it solve? How would it work?"></textarea>
+                                <p class="text-xs text-gray-500 mt-1 text-right"><span id="descCount">0</span>/2000</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">Tags (comma separated)</label>
+                                <input type="text" id="ideaTags" maxlength="100" class="modern-input w-full px-4 py-3 rounded-xl" placeholder="e.g., feature, improvement, design">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">Attachments</label>
+                                <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center hover:border-primary-500 transition-colors cursor-pointer" onclick="document.getElementById('ideaFiles').click()">
+                                    <input type="file" id="ideaFiles" multiple accept="image/*,.pdf,.txt" class="hidden" onchange="App.handleFileSelect(this)">
+                                    <div id="fileList" class="text-sm text-gray-500">
+                                        <span class="text-2xl block mb-2">📎</span>
+                                        Click to upload files (max 5MB each)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3 pt-4">
+                                <button type="button" onclick="App.closeModal()" class="flex-1 px-6 py-3 rounded-xl font-semibold border-2 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="flex-1 btn-primary text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-primary-500/30">
+                                    Submit Idea
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                // Character counter
+                modal.querySelector('#ideaDescription').addEventListener('input', (e) => {
+                    modal.querySelector('#descCount').textContent = e.target.value.length;
+                });
+
+                // Form handler
+                modal.querySelector('#newIdeaForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.submitIdea();
+                });
+            },
+
+            viewIdeaDetail(ideaId) {
+                const idea = Store.data.ideas.find(i => i.id === ideaId);
+                if (!idea) return;
+
+                // Increment views
+                idea.views = (idea.views || 0) + 1;
+                Store.setIdeas(Store.data.ideas);
+
+                const modal = document.createElement('div');
+                modal.id = 'ideaDetailModal';
+                modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeInUp';
+                modal.innerHTML = `
+                    <div class="glass rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 md:p-8 animate-slideIn">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-3">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold text-white ${UI.getStatusClass(idea.status)}">
+                                    ${UI.getStatusLabel(idea.status)}
+                                </span>
+                                <span class="text-sm text-gray-500">${UI.timeAgo(idea.createdAt)}</span>
+                            </div>
+                            <button onclick="App.closeModal()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <h2 class="text-3xl font-bold mb-4">${SecurityUtils.sanitize(idea.title)}</h2>
+
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white font-bold">
+                                ${idea.author[0].toUpperCase()}
+                            </div>
+                            <div>
+                                <p class="font-semibold">${SecurityUtils.sanitize(idea.author)}</p>
+                                <p class="text-sm text-gray-500">Original Poster</p>
+                            </div>
+                        </div>
+
+                        <div class="prose dark:prose-invert max-w-none mb-8">
+                            <p class="text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">${SecurityUtils.sanitize(idea.description)}</p>
+                        </div>
+
+                        ${idea.tags?.length ? `
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                ${idea.tags.map(tag => `
+                                    <span class="px-3 py-1 rounded-full text-sm font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">
+                                        #${SecurityUtils.sanitize(tag)}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
+                        <div class="flex items-center gap-6 py-4 border-y border-gray-200 dark:border-gray-700 mb-8">
+                            <button onclick="App.voteIdea('${idea.id}'); App.refreshModal()" class="flex items-center gap-2 ${idea.votedBy?.includes(Store.data.currentUser.id || Store.data.currentUser.name) ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'} hover:text-primary-600 transition-colors">
+                                <svg class="w-6 h-6 ${idea.votedBy?.includes(Store.data.currentUser.id || Store.data.currentUser.name) ? 'fill-current' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                                <span class="font-bold text-lg">${idea.votes || 0} votes</span>
+                            </button>
+                            <span class="text-gray-400">•</span>
+                            <span class="text-gray-500 dark:text-gray-400">${idea.views || 0} views</span>
+                        </div>
+
+                        <!-- Comments Section -->
+                        <div class="space-y-4">
+                            <h4 class="font-bold text-lg flex items-center gap-2">
+                                💬 Comments (${idea.comments?.length || 0})
+                            </h4>
+
+                            ${idea.comments?.length ? `
+                                <div class="space-y-4 mb-6">
+                                    ${idea.comments.map(c => `
+                                        <div class="flex gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                                                ${c.user[0].toUpperCase()}
+                                            </div>
+                                            <div class="flex-1 bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4">
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <span class="font-semibold text-sm">${SecurityUtils.sanitize(c.user)}</span>
+                                                    <span class="text-xs text-gray-500">${UI.timeAgo(c.createdAt)}</span>
+                                                </div>
+                                                <p class="text-gray-600 dark:text-gray-300 text-sm">${SecurityUtils.sanitize(c.text)}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : '<p class="text-gray-500 text-center py-4">No comments yet. Be the first to share your thoughts!</p>'}
+
+                            <!-- Add Comment -->
+                            <div class="flex gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white font-bold flex-shrink-0">
+                                    ${Store.data.currentUser.name[0].toUpperCase()}
+                                </div>
+                                <div class="flex-1">
+                                    <textarea id="newComment" rows="3" class="modern-input w-full px-4 py-3 rounded-xl resize-none" placeholder="Add a comment..." maxlength="500"></textarea>
+                                    <div class="flex justify-end mt-2">
+                                        <button onclick="App.addComment('${idea.id}')" class="btn-primary text-white px-6 py-2 rounded-xl font-semibold text-sm shadow-lg shadow-primary-500/30">
+                                            Post Comment
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${idea.status === 'new' && (idea.comments?.length === 0) ? `
+                            <div class="mt-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
+                                <p class="text-sm text-yellow-800 dark:text-yellow-200">
+                                    💡 This idea hasn't received much engagement yet.
+                                    <button onclick="App.startDiscussion('${idea.id}')" class="font-bold underline hover:text-yellow-600">Start a dedicated discussion</button> to explore it further.
+                                </p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            },
+
+            closeModal() {
+                const modal = document.getElementById('newIdeaModal') || document.getElementById('ideaDetailModal');
+                if (modal) {
+                    modal.style.opacity = '0';
+                    setTimeout(() => modal.remove(), 300);
+                }
+            },
+
+            refreshModal() {
+                const ideaId = document.getElementById('ideaDetailModal')?.querySelector('button[onclick^="App.voteIdea"]')?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+                if (ideaId) {
+                    this.closeModal();
+                    setTimeout(() => this.viewIdeaDetail(ideaId), 350);
+                }
+            },
+
+            // ==========================================
+            // EVENT HANDLERS
+            // ==========================================
+
+            attachLoginListeners() {
+                document.getElementById('loginBtn')?.addEventListener('click', () => {
+                    const name = document.getElementById('loginName')?.value.trim();
+                    const role = document.getElementById('loginRole')?.value;
+
+                    if (!name) {
+                        UI.showToast('Please enter your name', 'error');
+                        return;
+                    }
+
+                    Store.setUser({
+                        id: SecurityUtils.generateId(),
+                        name: name,
+                        role: role,
+                        joinedAt: Date.now()
+                    });
+
+                    UI.showToast(`Welcome to IdeaFlow, ${name}!`, 'success');
+                });
+
+                // Enter key support
+                document.getElementById('loginName')?.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') document.getElementById('loginBtn')?.click();
+                });
+            },
+
+            attachMainListeners() {
+                // Theme toggle
+                document.getElementById('toggleTheme')?.addEventListener('click', () => {
+                    Store.toggleDarkMode();
+                });
+
+                // Tutorial
+                document.getElementById('startTutorial')?.addEventListener('click', () => {
+                    this.startTutorial();
+                });
+
+                // Logout
+                document.getElementById('logoutBtn')?.addEventListener('click', () => {
+                    Store.setUser(null);
+                    UI.showToast('Signed out successfully', 'info');
+                });
+            },
+
+            // ==========================================
+            // ACTIONS
+            // ==========================================
+
+            navigate(view) {
+                Store.setView(view);
+            },
+
+            setFilter(filter) {
+                Store.setFilter(filter);
+            },
+
+            setSort(sortBy) {
+                Store.setSort(sortBy);
+            },
+
+            submitIdea() {
+                const title = document.getElementById('ideaTitle')?.value.trim();
+                const description = document.getElementById('ideaDescription')?.value.trim();
+                const tagsInput = document.getElementById('ideaTags')?.value.trim();
+
+                if (!title || !description) {
+                    UI.showToast('Please fill in all required fields', 'error');
+                    return;
+                }
+
+                const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
+                const files = document.getElementById('ideaFiles')?.files;
+                const attachments = files ? Array.from(files).map(f => ({ name: f.name, size: f.size, type: f.type })) : [];
+
+                Store.addIdea({
+                    title: SecurityUtils.sanitize(title),
+                    description: SecurityUtils.sanitize(description),
+                    author: Store.data.currentUser.name,
+                    authorId: Store.data.currentUser.id,
+                    tags: tags.map(SecurityUtils.sanitize),
+                    attachments
+                });
+
+                this.closeModal();
+                UI.showToast('Idea submitted successfully!', 'success');
+
+                // Navigate to ideas list
+                if (Store.data.view !== 'ideas') {
+                    Store.setView('ideas');
+                }
+            },
+
+            handleFileSelect(input) {
+                const files = Array.from(input.files);
+                const validFiles = files.filter(SecurityUtils.validateFile);
+
+                if (validFiles.length !== files.length) {
+                    UI.showToast('Some files were rejected (max 5MB, images/PDF/txt only)', 'warning');
+                }
+
+                const fileList = document.getElementById('fileList');
+                if (validFiles.length > 0) {
+                    fileList.innerHTML = validFiles.map(f => `
+                        <div class="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg mb-2">
+                            <span>📎</span>
+                            <span class="font-medium text-sm">${SecurityUtils.sanitize(f.name)}</span>
+                            <span class="text-xs text-gray-500">(${(f.size / 1024).toFixed(1)} KB)</span>
+                        </div>
+                    `).join('');
+                }
+            },
+
+            voteIdea(ideaId) {
+                const success = Store.voteIdea(ideaId, Store.data.currentUser.id || Store.data.currentUser.name);
+                if (success) {
+                    UI.showToast('Vote recorded!', 'success');
+                } else {
+                    UI.showToast('You already voted for this idea', 'info');
+                }
+            },
+
+            addComment(ideaId) {
+                const text = document.getElementById('newComment')?.value.trim();
+                if (!text) {
+                    UI.showToast('Please write a comment first', 'warning');
+                    return;
+                }
+
+                Store.addComment(ideaId, {
+                    user: Store.data.currentUser.name,
+                    text: SecurityUtils.sanitize(text)
+                });
+
+                this.refreshModal();
+                UI.showToast('Comment added!', 'success');
+            },
+
+            startDiscussion(ideaId) {
+                const topic = prompt('Enter discussion topic:');
+                if (!topic) return;
+
+                const message = prompt('Enter your initial message:');
+                if (!message) return;
+
+                Store.addDiscussion(ideaId, {
+                    user: Store.data.currentUser.name,
+                    topic: SecurityUtils.sanitize(topic),
+                    message: SecurityUtils.sanitize(message)
+                });
+
+                UI.showToast('Discussion started!', 'success');
+                Store.setView('discussions');
+            },
+
+            deleteIdea(id) {
+                if (confirm('Are you sure you want to delete this idea? This cannot be undone.')) {
+                    Store.deleteIdea(id);
+                }
+            },
+
+            // ==========================================
+            // TUTORIAL SYSTEM
+            // ==========================================
+
+            startTutorial() {
+                Store.completeTutorial();
+
+                const steps = [
+                    {
+                        element: '[onclick="App.navigate(\'dashboard\')"]',
+                        title: 'Welcome to IdeaFlow! 👋',
+                        text: 'This is your dashboard where you can see team activity and statistics.',
+                        position: 'right'
+                    },
+                    {
+                        element: '[onclick="App.showNewIdeaModal()"]',
+                        title: 'Share Your Ideas 💡',
+                        text: 'Click here to submit new ideas. Be creative and descriptive!',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '[onclick="App.navigate(\'ideas\')"]',
+                        title: 'Browse Ideas 📋',
+                        text: 'View all team ideas, filter by status, and sort by popularity or date.',
+                        position: 'right'
+                    },
+                    {
+                        element: '#toggleTheme',
+                        title: 'Customize 🎨',
+                        text: 'Toggle between light and dark mode for your comfort.',
+                        position: 'right'
+                    }
+                ];
+
+                let currentStep = 0;
+
+                const showStep = () => {
+                    if (currentStep >= steps.length) {
+                        document.getElementById('tutorialOverlay')?.classList.add('hidden');
+                        document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+                        UI.showToast('Tutorial completed! You are ready to collaborate.', 'success');
+                        return;
+                    }
+
+                    const step = steps[currentStep];
+                    const element = document.querySelector(step.element);
+
+                    if (element) {
+                        // Remove previous highlights
+                        document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+
+                        // Add highlight
+                        element.classList.add('tutorial-highlight');
+
+                        // Show overlay
+                        const overlay = document.getElementById('tutorialOverlay');
+                        overlay.classList.remove('hidden');
+
+                        // Create tooltip
+                        const existingTooltip = document.getElementById('tutorialTooltip');
+                        if (existingTooltip) existingTooltip.remove();
+
+                        const tooltip = document.createElement('div');
+                        tooltip.id = 'tutorialTooltip';
+                        tooltip.className = 'fixed z-50 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-sm animate-fadeInUp';
+
+                        const rect = element.getBoundingClientRect();
+                        let top = rect.bottom + 20;
+                        let left = rect.left;
+
+                        if (step.position === 'right') {
+                            top = rect.top;
+                            left = rect.right + 20;
+                        }
+
+                        // Boundary checks
+                        if (left + 320 > window.innerWidth) left = window.innerWidth - 340;
+                        if (top + 200 > window.innerHeight) top = rect.top - 220;
+
+                        tooltip.style.top = `${top}px`;
+                        tooltip.style.left = `${left}px`;
+
+                        tooltip.innerHTML = `
+                            <h4 class="font-bold text-lg mb-2">${step.title}</h4>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">${step.text}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-gray-400">Step ${currentStep + 1} of ${steps.length}</span>
+                                <button onclick="App.nextTutorialStep()" class="btn-primary text-white px-4 py-2 rounded-lg font-semibold text-sm">
+                                    ${currentStep === steps.length - 1 ? 'Finish' : 'Next →'}
+                                </button>
+                            </div>
+                        `;
+
+                        document.body.appendChild(tooltip);
+                    }
+
+                    currentStep++;
+                };
+
+                this.nextTutorialStep = showStep;
+                showStep();
+            },
+
+            // ==========================================
+            // HELPERS
+            // ==========================================
+
+            calculateStats() {
+                const now = Date.now();
+                const weekAgo = now - (7 * 24 * 60 * 60 * 1000);
+
+                return {
+                    total: Store.data.ideas.length,
+                    thisWeek: Store.data.ideas.filter(i => i.createdAt > weekAgo).length,
+                    discussing: Store.data.ideas.filter(i => i.status === 'discussing').length,
+                    implemented: Store.data.ideas.filter(i => i.status === 'implemented').length
+                };
+            }
+        };
+
+        // Initialize App when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            App.init();
+        });
+
+        // Expose App to window for onclick handlers
+        window.App = App;
+    </script>
+</body>
+</html>
